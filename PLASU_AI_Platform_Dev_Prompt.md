@@ -397,10 +397,10 @@ AWS_SECRET_ACCESS_KEY= (optional)
 **Goal:** A moderated, course-specific discussion forum for student collaboration.
 
 **Checklist:**
-- [ ] `POST /api/forum/posts` — Create forum post: `{ courseId, title, content, tags[] }`; trigger AI moderation check; if safe, set `isApproved = true`; if flagged, hold for admin review
-- [ ] `GET /api/forum/posts` — List approved posts, filterable by `courseId`, `tags`; sortable by newest / most upvoted; paginated
-- [ ] `GET /api/forum/posts/:id` — Get post with all replies
-- [ ] `POST /api/forum/posts/:id/replies` — Post a reply; trigger AI moderation
+- [x] `POST /api/forum/posts` — Create forum post: `{ courseId, title, content, tags[] }`; trigger AI moderation check; if safe, set `isApproved = true`; if flagged, hold for admin review
+- [x] `GET /api/forum/posts` — List approved posts, filterable by `courseId`, `tags`; sortable by newest / most upvoted; paginated
+- [x] `GET /api/forum/posts/:id` — Get post with all replies
+- [x] `POST /api/forum/posts/:id/replies` — Post a reply; trigger AI moderation
 - [ ] `POST /api/forum/posts/:id/upvote` — Toggle upvote on a post (one per user)
 - [ ] `POST /api/forum/replies/:id/upvote` — Toggle upvote on a reply
 - [ ] `POST /api/forum/posts/:id/flag` — Student-flagged report (sends to moderation queue)
@@ -616,7 +616,7 @@ PHASE 3 — Student Features
 [ ] Feature 16: Personalized Study Recommendations
 
 PHASE 4 — Collaboration
-[ ] Feature 17: Student Forum
+[x] Feature 17: Student Forum
 [ ] Feature 18: Study Groups
 
 PHASE 5 — Gamification
