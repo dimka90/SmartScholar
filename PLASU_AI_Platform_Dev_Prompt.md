@@ -149,14 +149,14 @@ AWS_SECRET_ACCESS_KEY= (optional)
 **Goal:** Admins can manage the academic catalogue that all content is organized under.
 
 **Checklist:**
-- [ ] `POST /api/admin/departments` — Create department (Admin only)
-- [ ] `GET /api/departments` — List all departments (authenticated)
-- [ ] `PUT /api/admin/departments/:id` — Update department
-- [ ] `DELETE /api/admin/departments/:id` — Soft-delete department
-- [ ] `POST /api/admin/courses` — Create course linked to a department
-- [ ] `GET /api/courses` — List courses, filterable by `departmentId`, `level`, `semester`
-- [ ] `PUT /api/admin/courses/:id` — Update course
-- [ ] `DELETE /api/admin/courses/:id` — Soft-delete course
+- [x] `POST /api/admin/departments` — Create department (Admin only)
+- [x] `GET /api/departments` — List all departments (authenticated)
+- [x] `PUT /api/admin/departments/:id` — Update department
+- [x] `DELETE /api/admin/departments/:id` — Soft-delete department
+- [x] `POST /api/admin/courses` — Create course linked to a department
+- [x] `GET /api/courses` — List courses, filterable by `departmentId`, `level`, `semester`
+- [x] `PUT /api/admin/courses/:id` — Update course
+- [x] `DELETE /api/admin/courses/:id` — Soft-delete course
 - [ ] Build admin UI: `/admin/departments` — list, create, edit, delete departments
 - [ ] Build admin UI: `/admin/courses` — list, create, edit, delete courses with department selector
 
