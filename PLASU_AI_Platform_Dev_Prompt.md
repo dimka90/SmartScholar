@@ -157,8 +157,8 @@ AWS_SECRET_ACCESS_KEY= (optional)
 - [x] `GET /api/courses` — List courses, filterable by `departmentId`, `level`, `semester`
 - [x] `PUT /api/admin/courses/:id` — Update course
 - [x] `DELETE /api/admin/courses/:id` — Soft-delete course
-- [ ] Build admin UI: `/admin/departments` — list, create, edit, delete departments
-- [ ] Build admin UI: `/admin/courses` — list, create, edit, delete courses with department selector
+- [x] Build admin UI: `/admin/departments` — list, create, edit, delete departments
+- [x] Build admin UI: `/admin/courses` — list, create, edit, delete courses with department selector
 
 ---
 
@@ -599,7 +599,7 @@ PHASE 1 — Foundation
 [x] Feature 3: Authentication System
 
 PHASE 2 — Admin Features
-[ ] Feature 4: Department & Course Management
+[x] Feature 4: Department & Course Management
 [ ] Feature 5: Document Upload & Management
 [ ] Feature 6: Document Version Control
 [ ] Feature 7: RAG Pipeline — Background Document Processing
