@@ -1,5 +1,6 @@
 import Fastify from 'fastify'
 import app from './app'
+import './lib/rag-worker'
 
 const server = Fastify({
   logger: true

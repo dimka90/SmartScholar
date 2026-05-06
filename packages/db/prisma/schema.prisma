@@ -93,6 +93,7 @@ model Document {
   mimeType     String
   version      Int          @default(1)
   isActive     Boolean      @default(true)
+  processingStatus String   @default("pending") // pending, processing, ready, failed
   tags         String[]
   summaryCache Json? // Cache for AI-generated summaries
   createdAt    DateTime     @default(now())

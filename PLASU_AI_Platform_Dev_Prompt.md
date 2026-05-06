@@ -199,13 +199,13 @@ AWS_SECRET_ACCESS_KEY= (optional)
 **Goal:** After upload, documents are automatically chunked, embedded, and stored in the vector database for AI retrieval.
 
 **Checklist:**
-- [ ] Set up BullMQ with Redis for job queueing
-- [ ] Create `document-processing` BullMQ queue
-- [ ] Implement worker that processes jobs: extract text from PDF using `pdf-parse`; split text into overlapping chunks (chunk size: ~500 tokens, overlap: ~50 tokens); generate embeddings for each chunk using OpenAI `text-embedding-3-small`; save chunks + vectors to `DocumentChunk` table
-- [ ] Handle processing errors gracefully (mark document as `processingFailed`, retry up to 3 times)
-- [ ] Expose `GET /api/documents/:id/processing-status` — returns `pending | processing | ready | failed`
+- [x] Set up BullMQ with Redis for job queueing
+- [x] Create `document-processing` BullMQ queue
+- [x] Implement worker that processes jobs: extract text from PDF using `pdf-parse`; split text into overlapping chunks (chunk size: ~500 tokens, overlap: ~50 tokens); generate embeddings for each chunk using OpenAI `text-embedding-3-small`; save chunks + vectors to `DocumentChunk` table
+- [x] Handle processing errors gracefully (mark document as `processingFailed`, retry up to 3 times)
+- [x] Expose `GET /api/documents/:id/processing-status` — returns `pending | processing | ready | failed`
 - [ ] Show processing status badge in admin UI (spinner while processing, green check when ready, red X on failure)
-- [ ] Implement `DELETE` cleanup — when a document is deleted, also delete all its `DocumentChunk` records
+- [x] Implement `DELETE` cleanup — when a document is deleted, also delete all its `DocumentChunk` records
 
 ---
 
@@ -602,7 +602,7 @@ PHASE 2 — Admin Features
 [x] Feature 4: Department & Course Management
 [ ] Feature 5: Document Upload & Management
 [ ] Feature 6: Document Version Control
-[ ] Feature 7: RAG Pipeline — Background Document Processing
+[x] Feature 7: RAG Pipeline — Background Document Processing
 [ ] Feature 8: Notification & Announcement System
 [ ] Feature 9: Admin Analytics Dashboard
 [ ] Feature 10: Forum Moderation

@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { pipeline } from 'node:stream/promises'
 import { Role, DocumentType } from '@smartscholar/db'
+import { documentQueue } from '../../lib/queue'
 
 const documentRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.addHook('preHandler', fastify.authenticate)
@@ -43,7 +44,10 @@ const documentRoutes: FastifyPluginAsync = async (fastify) => {
       }
     })
 
-    // TODO: Enqueue RAG processing job (BullMQ)
+    await documentQueue.add('process', {
+      documentId: document.id,
+      filePath: document.filePath
+    })
     
     return document
   })
