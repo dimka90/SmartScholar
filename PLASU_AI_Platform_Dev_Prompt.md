@@ -93,7 +93,7 @@ AWS_SECRET_ACCESS_KEY= (optional)
 
 ---
 
-### Feature 2: Database Schema Design
+- [x] Feature 2: Database Schema Design
 
 **Goal:** Define all Prisma models that will support every feature in this document.
 
@@ -595,7 +595,7 @@ Copy this as your progress tracker:
 ```
 PHASE 1 — Foundation
 [x] Feature 1: Project Scaffolding & Environment Setup
-[ ] Feature 2: Database Schema Design
+[x] Feature 2: Database Schema Design
 [ ] Feature 3: Authentication System
 
 PHASE 2 — Admin Features

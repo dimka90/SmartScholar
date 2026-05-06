@@ -9,6 +9,24 @@ datasource db {
   extensions = [pgvector(map: "vector")]
 }
 
+enum Role {
+  STUDENT
+  LECTURER
+  MODERATOR
+  ADMIN
+}
+
+enum DocumentType {
+  HANDOUT
+  PAST_QUESTION
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
 model User {
   id           String   @id @default(cuid())
   name         String
@@ -19,11 +37,241 @@ model User {
   points       Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  // Relations
+  uploadedDocuments Document[]        @relation("UploadedBy")
+  documentVersions  DocumentVersion[]
+  chatSessions      ChatSession[]
+  examSessions      ExamSession[]
+  bookmarks         Bookmark[]
+  createdGroups     StudyGroup[]      @relation("GroupCreator")
+  groupMemberships  StudyGroup[]      @relation("GroupMembers")
+  groupMessages     GroupMessage[]
+  forumPosts        ForumPost[]
+  forumReplies      ForumReply[]
+  notifications     Notification[]
+  badges            UserBadge[]
+  activityLogs      ActivityLog[]
 }
 
-enum Role {
-  STUDENT
-  LECTURER
-  MODERATOR
-  ADMIN
+model Department {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  description String?
+  courses     Course[]
+}
+
+model Course {
+  id           String     @id @default(cuid())
+  name         String
+  code         String     @unique
+  level        Int // e.g. 100, 200
+  semester     Int // 1 or 2
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  documents          Document[]
+  chatSessions       ChatSession[]
+  examSessions       ExamSession[]
+  bookmarks          Bookmark[]
+  studyGroups        StudyGroup[]
+  forumPosts         ForumPost[]
+  extractedQuestions ExtractedQuestion[]
+}
+
+model Document {
+  id           String       @id @default(cuid())
+  title        String
+  type         DocumentType
+  courseId     String
+  course       Course       @relation(fields: [courseId], references: [id])
+  uploadedById String
+  uploadedBy   User         @relation("UploadedBy", fields: [uploadedById], references: [id])
+  filePath     String
+  fileSize     Int
+  mimeType     String
+  version      Int          @default(1)
+  isActive     Boolean      @default(true)
+  tags         String[]
+  summaryCache Json? // Cache for AI-generated summaries
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  versions           DocumentVersion[]
+  chunks             DocumentChunk[]
+  bookmarks          Bookmark[]
+  extractedQuestions ExtractedQuestion[]
+}
+
+model DocumentVersion {
+  id           String   @id @default(cuid())
+  documentId   String
+  document     Document @relation(fields: [documentId], references: [id])
+  version      Int
+  filePath     String
+  uploadedById String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model DocumentChunk {
+  id         String                 @id @default(cuid())
+  documentId String
+  document   Document               @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  content    String
+  chunkIndex Int
+  embedding  Unsupported("vector")?
+}
+
+model ChatSession {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  title     String
+  createdAt DateTime @default(now())
+
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id          String      @id @default(cuid())
+  sessionId   String
+  session     ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role        String // 'user' or 'assistant'
+  content     String
+  sourcesUsed Json? // Referenced document IDs and chunk indices
+  createdAt   DateTime    @default(now())
+}
+
+model ExamSession {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  courseId       String
+  course         Course   @relation(fields: [courseId], references: [id])
+  questions      Json // List of question objects
+  answers        Json // Student answers
+  score          Int      @default(0)
+  totalQuestions Int
+  completedAt    DateTime?
+  createdAt      DateTime @default(now())
+}
+
+model ExtractedQuestion {
+  id            String     @id @default(cuid())
+  documentId    String
+  document      Document   @relation(fields: [documentId], references: [id])
+  courseId      String
+  course        Course     @relation(fields: [courseId], references: [id])
+  question      String
+  options       String[] // For MCQ
+  correctAnswer String
+  explanation   String?
+  difficulty    Difficulty @default(MEDIUM)
+}
+
+model Bookmark {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id])
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id])
+  questionRef String? // For specific question reference
+  note        String?
+  createdAt   DateTime @default(now())
+}
+
+model StudyGroup {
+  id          String   @id @default(cuid())
+  name        String
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id])
+  createdById String
+  creator     User     @relation("GroupCreator", fields: [createdById], references: [id])
+  members     User[]   @relation("GroupMembers")
+  createdAt   DateTime @default(now())
+
+  messages GroupMessage[]
+}
+
+model GroupMessage {
+  id        String     @id @default(cuid())
+  groupId   String
+  group     StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime   @default(now())
+}
+
+model ForumPost {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  courseId   String
+  course     Course   @relation(fields: [courseId], references: [id])
+  title      String
+  content    String
+  tags       String[]
+  upvotes    Int      @default(0)
+  isFlagged  Boolean  @default(false)
+  isApproved Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  replies ForumReply[]
+}
+
+model ForumReply {
+  id        String    @id @default(cuid())
+  postId    String
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  content   String
+  upvotes   Int       @default(0)
+  createdAt DateTime  @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  title     String
+  body      String
+  isRead    Boolean  @default(false)
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  iconUrl     String
+  criteria    Json
+  users       UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  awardedAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
 }
