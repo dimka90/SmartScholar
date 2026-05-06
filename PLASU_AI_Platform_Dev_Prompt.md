@@ -279,12 +279,12 @@ AWS_SECRET_ACCESS_KEY= (optional)
 - Save the full exchange to `ChatMessage` with `sourcesUsed` containing referenced document IDs and chunk indices
 
 **Checklist:**
-- [ ] `POST /api/chat/sessions` — Create a new chat session for a course
-- [ ] `GET /api/chat/sessions` — List user's chat sessions (most recent first)
-- [ ] `GET /api/chat/sessions/:id/messages` — Fetch all messages in a session
-- [ ] `DELETE /api/chat/sessions/:id` — Delete a chat session and its messages
-- [ ] `POST /api/chat/sessions/:id/messages` — Send a message; trigger RAG pipeline; stream response using Fastify's reply streaming
-- [ ] Enforce strict RAG grounding: if no relevant chunks found (similarity below threshold), respond with "I could not find an answer to this in the uploaded materials."
+- [x] `POST /api/chat/sessions` — Create a new chat session for a course
+- [x] `GET /api/chat/sessions` — List user's chat sessions (most recent first)
+- [x] `GET /api/chat/sessions/:id/messages` — Fetch all messages in a session
+- [x] `DELETE /api/chat/sessions/:id` — Delete a chat session and its messages
+- [x] `POST /api/chat/sessions/:id/messages` — Send a message; trigger RAG pipeline; stream response using Fastify's reply streaming
+- [x] Enforce strict RAG grounding: if no relevant chunks found (similarity below threshold), respond with "I could not find an answer to this in the uploaded materials."
 - [ ] Build `/chat` page with:
   - [ ] Course selector dropdown
   - [ ] Chat session sidebar (list of past sessions, new session button)
@@ -608,7 +608,7 @@ PHASE 2 — Admin Features
 [ ] Feature 10: Forum Moderation
 
 PHASE 3 — Student Features
-[ ] Feature 11: AI Chat Interface (RAG)
+[x] Feature 11: AI Chat Interface (RAG)
 [ ] Feature 12: AI-Powered Document Summaries
 [ ] Feature 13: Exam Simulation Mode
 [ ] Feature 14: Bookmarking & Personal Notes
