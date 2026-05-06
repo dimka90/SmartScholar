@@ -120,7 +120,7 @@ AWS_SECRET_ACCESS_KEY= (optional)
 
 ---
 
-### Feature 3: Authentication System
+- [x] Feature 3: Authentication System
 
 **Goal:** Secure, role-based authentication for all users.
 
@@ -596,7 +596,7 @@ Copy this as your progress tracker:
 PHASE 1 — Foundation
 [x] Feature 1: Project Scaffolding & Environment Setup
 [x] Feature 2: Database Schema Design
-[ ] Feature 3: Authentication System
+[x] Feature 3: Authentication System
 
 PHASE 2 — Admin Features
 [ ] Feature 4: Department & Course Management
