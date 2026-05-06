@@ -167,11 +167,11 @@ AWS_SECRET_ACCESS_KEY= (optional)
 **Goal:** Admins and lecturers can upload, categorize, and manage academic documents.
 
 **Checklist:**
-- [ ] `POST /api/documents/upload` — Multipart file upload (PDF only); save file to storage; create `Document` record; enqueue background processing job
-- [ ] `GET /api/documents` — List documents, filterable by `courseId`, `type`, `tags`; paginated
-- [ ] `GET /api/documents/:id` — Get document metadata and download URL
-- [ ] `PUT /api/documents/:id` — Update document metadata (title, tags, courseId)
-- [ ] `DELETE /api/documents/:id` — Soft-delete document (set `isActive = false`)
+- [x] `POST /api/documents/upload` — Multipart file upload (PDF only); save file to storage; create `Document` record; enqueue background processing job
+- [x] `GET /api/documents` — List documents, filterable by `courseId`, `type`, `tags`; paginated
+- [x] `GET /api/documents/:id` — Get document metadata and download URL
+- [x] `PUT /api/documents/:id` — Update document metadata (title, tags, courseId)
+- [x] `DELETE /api/documents/:id` — Soft-delete document (set `isActive = false`)
 - [ ] Implement **AI-Assisted Auto-Tagging**: after upload, call OpenAI to suggest relevant tags based on document title + first 500 chars; save suggested tags to `Document.tags`
 - [ ] Build admin UI: `/admin/documents` — searchable, filterable document table with upload button
 - [ ] Build upload modal with drag-and-drop, file type validation (PDF only), course + type selector, tags input (with AI suggestion), progress bar
