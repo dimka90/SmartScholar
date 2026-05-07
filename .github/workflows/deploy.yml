@@ -78,9 +78,11 @@ jobs:
             # Login to registry on the server
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             
-            # Set variable for docker-compose
+            # Set variables for docker-compose
             export DOCKER_REPOSITORY=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
             export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
             
             # Pull latest images
             docker-compose pull
