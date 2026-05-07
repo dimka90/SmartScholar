@@ -35,7 +35,7 @@ export default fp(async (fastify) => {
   })
 
   // 4. Custom Error Handler for Zod/Validation
-  fastify.setErrorHandler((error, request, reply) => {
+  fastify.setErrorHandler((error: any, request, reply) => {
     if (error.validation) {
       return reply.status(400).send({
         statusCode: 400,

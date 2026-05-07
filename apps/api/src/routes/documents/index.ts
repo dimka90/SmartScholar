@@ -78,7 +78,7 @@ const documentRoutes: FastifyPluginAsync = async (fastify) => {
     if (!document) return reply.status(404).send({ message: 'Document not found' })
     if (document.summaryCache) return document.summaryCache
 
-    const context = document.chunks.map(c => c.content).join('\n\n')
+    const context = document.chunks.map((c: any) => c.content).join('\n\n')
 
     const response = await fastify.openai.chat.completions.create({
       model: 'gpt-4o',

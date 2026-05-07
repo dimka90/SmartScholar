@@ -27,7 +27,7 @@ async function checkAndAwardBadges(userId: string) {
 
   if (!user) return
 
-  const earnedBadgeIds = user.badges.map(b => b.badgeId)
+  const earnedBadgeIds = user.badges.map((b: any) => b.badgeId)
 
   // Scholar Badge (500 points)
   if (user.points >= 500) {

@@ -25,7 +25,7 @@ const lecturerRoutes: FastifyPluginAsync = async (fastify) => {
     })
 
     const avgScore = sessions.length > 0 
-      ? sessions.reduce((acc, s) => acc + (s.score / s.totalQuestions), 0) / sessions.length
+      ? sessions.reduce((acc: number, s: any) => acc + (s.score / s.totalQuestions), 0) / sessions.length
       : 0
 
     return {

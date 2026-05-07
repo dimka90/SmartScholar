@@ -37,8 +37,8 @@ const searchRoutes: FastifyPluginAsync = async (fastify) => {
     ])
 
     return {
-      documents: documents.map(d => ({ ...d, type: 'DOCUMENT' })),
-      posts: posts.map(p => ({ ...p, type: 'FORUM_POST' }))
+      documents: documents.map((d: any) => ({ ...d, type: 'DOCUMENT' })),
+      posts: posts.map((p: any) => ({ ...p, type: 'FORUM_POST' }))
     }
   })
 }

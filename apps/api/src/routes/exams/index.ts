@@ -14,7 +14,7 @@ const examRoutes: FastifyPluginAsync = async (fastify) => {
 
     if (!doc) return reply.status(404).send({ message: 'Document not found' })
 
-    const context = doc.chunks.map(c => c.content).join('\n\n')
+    const context = doc.chunks.map((c: any) => c.content).join('\n\n')
 
     const response = await fastify.openai.chat.completions.create({
       model: 'gpt-4o',

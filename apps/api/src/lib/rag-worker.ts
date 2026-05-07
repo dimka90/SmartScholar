@@ -24,7 +24,7 @@ export const ragWorker = new Worker(
 
       // 1. Extract text from PDF
       const dataBuffer = await fs.readFile(absolutePath)
-      const data = await pdf(dataBuffer)
+      const data = await (pdf as any)(dataBuffer)
       const text = data.text
 
       // 2. Chunk text
@@ -64,7 +64,7 @@ export const ragWorker = new Worker(
       })
 
       console.log(`Document ${documentId} processed successfully`)
-    } catch (error) {
+    } catch (error: any) {
       await prisma.document.update({
         where: { id: documentId },
         data: { processingStatus: 'failed' }
