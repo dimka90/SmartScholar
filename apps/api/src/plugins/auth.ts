@@ -6,6 +6,7 @@ declare module 'fastify' {
   interface FastifyInstance {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>
     requireRole: (roles: Role[]) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>
+    authorize: (roles: string[]) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>
   }
 }
 
@@ -30,6 +31,15 @@ export default fp(async (fastify) => {
       const user = request.user
       if (!user || !roles.includes(user.role)) {
         return reply.status(403).send({ message: 'Forbidden: Insufficient permissions' })
+      }
+    }
+  })
+
+  fastify.decorate('authorize', (roles: string[]) => {
+    return async (request: FastifyRequest, reply: FastifyReply) => {
+      await fastify.authenticate(request, reply)
+      if (!roles.includes(request.user.role)) {
+        return reply.status(403).send({ message: 'Forbidden' })
       }
     }
   })

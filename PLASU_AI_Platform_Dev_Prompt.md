@@ -303,10 +303,10 @@ AWS_SECRET_ACCESS_KEY= (optional)
 - [x] `POST /api/documents/:id/summarize` — Retrieve all chunks for the document; call OpenAI to generate a structured summary with: Overview (2–3 sentences), Key Concepts (bullet list), Likely Exam Topics (bullet list); cache the result in the `Document` record (add `summaryCache` JSON field)
 - [x] If summary already cached (and document version unchanged), return cached version without calling OpenAI again
 - [x] Build document detail page `/documents/:id` with:
-  - [x] Document viewer (PDF iframe embed or link)
-  - [x] "Generate Summary" button with loading state
-  - [x] Rendered summary with Overview, Key Concepts, Exam Topics sections
-  - [ ] "Download Summary" button (generates a plain-text or PDF summary file)
+- [x] Document viewer (PDF iframe embed or link)
+- [x] "Generate Summary" button with loading state
+- [x] Rendered summary with Overview, Key Concepts, Exam Topics sections
+- [ ] "Download Summary" button (generates a plain-text or PDF summary file)
 - [ ] Show a "Summary available" badge on document cards where summary has been generated
 
 ---
@@ -427,16 +427,20 @@ AWS_SECRET_ACCESS_KEY= (optional)
 - [x] `DELETE /api/groups/:id/leave` — Leave a group
 - [x] `GET /api/groups/:id/messages` — Fetch group chat history
 - [x] `POST /api/groups/:id/messages` — Send a real-time message (integrate with Socket.IO)
-- [ ] Implement real-time group chat via Socket.IO:
-  - [ ] Clients join a Socket.IO room per group (`group:{id}`)
-  - [ ] `sendGroupMessage` event — broadcast message to room; save to `GroupMessage`
-  - [ ] `typing` event — broadcast typing indicator to room
-  - [ ] Show online members list using Socket.IO presence
-- [ ] Build `/groups` page:
-  - [ ] My Groups sidebar
-  - [ ] Create Group modal
-  - [ ] Group chat view: message history, message input, member list panel, typing indicator
-  - [ ] Invite modal (enter email)
+- [x] Implement real-time group chat via Socket.IO:
+  - [x] Clients join a Socket.IO room per group (`group:{id}`)
+  - [x] `sendGroupMessage` event — broadcast message to room; save to `GroupMessage`
+  - [x] `typing` event — broadcast typing indicator to room
+  - [x] Show online members list using Socket.IO presence
+- [x] Build `/groups` lobby:
+  - [x] List of available groups with member counts
+  - [x] Search and filter by course
+  - [x] "Create Group" button
+- [x] Build `/groups/:id` real-time chat interface:
+  - [x] Group header with course name and member list
+  - [x] Scrollable message thread with sender avatars
+  - [x] Real-time message input with support for emojis and file attachments (mock)
+  - [x] Member list sidebar showing online status
 
 ---
 
@@ -623,7 +627,7 @@ PHASE 5 — Gamification
 [x] Feature 19: Points, Badges & Leaderboard
 
 PHASE 6 — Access Control
-[ ] Feature 20: Role-Based Access & Lecturer Portal
+[x] Feature 20: Role-Based Access & Lecturer Portal
 
 PHASE 7 — Polish & Deployment
 [ ] Feature 21: Security Hardening
