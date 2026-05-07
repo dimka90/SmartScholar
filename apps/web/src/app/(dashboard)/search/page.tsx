@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Search, FileText, MessageSquare, BookOpen, ChevronRight, Loader2 } from 'lucide-react'
 
-export default function SearchPage() {
+function SearchResults() {
   const searchParams = useSearchParams()
   const query = searchParams.get('q')
   const [results, setResults] = useState<{ documents: any[], posts: any[] } | null>(null)
@@ -43,7 +43,7 @@ export default function SearchPage() {
               Documents ({results.documents.length})
             </h2>
             <div className="grid grid-cols-1 gap-4">
-              {results.documents.map(doc => (
+              {results.documents.map((doc: any) => (
                 <Link 
                   key={doc.id} 
                   href={`/documents/${doc.id}`}
@@ -74,7 +74,7 @@ export default function SearchPage() {
               Forum Discussions ({results.posts.length})
             </h2>
             <div className="grid grid-cols-1 gap-4">
-              {results.posts.map(post => (
+              {results.posts.map((post: any) => (
                 <Link 
                   key={post.id} 
                   href={`/forum/${post.id}`}
@@ -105,5 +105,17 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center p-24">
+        <Loader2 className="animate-spin text-blue-600 w-12 h-12" />
+      </div>
+    }>
+      <SearchResults />
+    </Suspense>
   )
 }
