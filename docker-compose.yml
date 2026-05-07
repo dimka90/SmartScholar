@@ -15,14 +15,17 @@ services:
       - "6379:6379"
 
   api:
+    image: ${DOCKER_REPOSITORY:-smart-scholar}/api:latest
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/smartscholar?schema=public
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: supersecret
+      JWT_SECRET: ${JWT_SECRET:-supersecret}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ALLOWED_ORIGINS: https://smartscholar.titacenter.com
+      NODE_ENV: production
     ports:
       - "4000:4000"
     depends_on:
@@ -30,13 +33,15 @@ services:
       - redis
 
   web:
+    image: ${DOCKER_REPOSITORY:-smart-scholar}/web:latest
     build:
       context: .
       dockerfile: apps/web/Dockerfile
     environment:
-      NEXT_PUBLIC_API_URL: http://api:4000
-      NEXTAUTH_SECRET: supersecret
-      NEXTAUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_API_URL: https://smartscholar.titacenter.com/api
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-supersecret}
+      NEXTAUTH_URL: https://smartscholar.titacenter.com
+      NODE_ENV: production
     ports:
       - "3000:3000"
     depends_on:
