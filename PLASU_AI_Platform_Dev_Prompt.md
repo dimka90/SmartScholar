@@ -328,14 +328,14 @@ AWS_SECRET_ACCESS_KEY= (optional)
 - [x] `POST /api/exam/sessions/:id/submit` — Accept student's answers; compute score; save to `ExamSession`; award points based on score; return detailed results with correct answers and explanations
 - [x] `GET /api/exam/sessions` — List user's past exam sessions with scores
 - [x] `GET /api/exam/sessions/:id` — Get full results of a completed session
-- [ ] Build `/exam` page:
-  - [ ] Course + question count selector
-  - [ ] Timer display (configurable, e.g., 1 minute per question)
-  - [ ] One question at a time with MCQ or short-answer input
-  - [ ] Progress indicator (Question 3 of 10)
-  - [ ] Auto-submit on timer expiry
-  - [ ] Results page: score breakdown, per-question feedback with correct answer + explanation, performance chart
-- [ ] After exam, log performance to `ActivityLog` and update student's `points`
+- [x] Build `/exam` page:
+  - [x] Course + question count selector
+  - [x] Timer display (configurable, e.g., 1 minute per question)
+  - [x] One question at a time with MCQ or short-answer input
+  - [x] Progress indicator (Question 3 of 10)
+  - [x] Auto-submit on timer expiry
+  - [x] Results page: score breakdown, per-question feedback with correct answer + explanation, performance chart
+- [x] After exam, log performance to `ActivityLog` and update student's `points`
 
 ---
 
@@ -612,7 +612,7 @@ PHASE 3 — Student Features
 [x] Feature 12: AI-Powered Document Summaries
 [x] Feature 13: Exam Simulation Mode
 [ ] Feature 14: Bookmarking & Personal Notes
-[ ] Feature 15: Student Analytics Dashboard
+[x] Feature 15: Student Analytics Dashboard
 [ ] Feature 16: Personalized Study Recommendations
 
 PHASE 4 — Collaboration
