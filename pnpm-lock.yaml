@@ -40,6 +40,9 @@ importers:
       '@langchain/textsplitters':
         specifier: ^1.0.1
         version: 1.0.1(@langchain/core@1.1.44(openai@6.36.0(zod@4.4.3)))
+      '@smartscholar/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       adm-zip:
         specifier: ^0.5.17
         version: 0.5.17
@@ -179,10 +182,11 @@ importers:
         version: 3.8.3
 
   packages/db:
-    devDependencies:
+    dependencies:
       '@prisma/client':
         specifier: ^6.19.3
         version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
+    devDependencies:
       prisma:
         specifier: ^6.19.3
         version: 6.19.3(typescript@5.9.3)
