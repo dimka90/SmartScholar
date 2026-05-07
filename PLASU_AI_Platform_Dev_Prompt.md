@@ -580,15 +580,15 @@ AWS_SECRET_ACCESS_KEY= (optional)
 ### Feature 25: Deployment & DevOps
 
 **Checklist:**
-- [ ] `Dockerfile` for `apps/api` (multi-stage build: build → production)
-- [ ] `Dockerfile` for `apps/web` (multi-stage Next.js build)
-- [ ] `docker-compose.yml` for local dev with all services + hot reload
-- [ ] `docker-compose.prod.yml` for production (no dev volumes, production ENV)
-- [ ] `prisma migrate deploy` runs automatically on API container startup
-- [ ] BullMQ worker runs as a separate process/container in production
-- [ ] Health check endpoint `GET /api/health` — returns `{ status: "ok", db: "connected", redis: "connected" }`
-- [ ] Graceful shutdown: Fastify closes connections cleanly on SIGTERM
-- [ ] `README.md` with: project description, full local setup guide, environment variable reference, architecture diagram (ASCII or Mermaid), API endpoint reference
+- [x] `Dockerfile` for `apps/api` (multi-stage build: build → production)
+- [x] `Dockerfile` for `apps/web` (multi-stage Next.js build)
+- [x] `docker-compose.yml` for local dev with all services + hot reload
+- [x] `docker-compose.prod.yml` for production (no dev volumes, production ENV)
+- [x] `prisma migrate deploy` runs automatically on API container startup
+- [x] BullMQ worker runs as a separate process/container in production
+- [x] Health check endpoint `GET /api/health` — returns `{ status: "ok", db: "connected", redis: "connected" }`
+- [x] Graceful shutdown: Fastify closes connections cleanly on SIGTERM
+- [x] `README.md` with: project description, full local setup guide, environment variable reference, architecture diagram (ASCII or Mermaid), API endpoint reference
 
 ---
 
@@ -634,7 +634,7 @@ PHASE 7 — Polish & Deployment
 [x] Feature 22: Search & Filtering
 [ ] Feature 23: Responsive UI & Accessibility
 [ ] Feature 24: Testing
-[ ] Feature 25: Deployment & DevOps
+[x] Feature 25: Deployment & DevOps
 ```
 
 ---

@@ -1,19 +1,25 @@
-FROM node:20-alpine AS base
-
-FROM base AS builder
-RUN apk add --no-cache libc6-compat
+# Base stage for shared dependencies
+FROM node:22-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+COPY . /app
 WORKDIR /app
-RUN npm install -g pnpm
-COPY . .
-RUN pnpm install --frozen-lockfile
+
+# Build stage
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run db:generate
 RUN pnpm --filter @smartscholar/api build
 
-FROM base AS runner
+# Production stage
+FROM node:22-slim AS production
 WORKDIR /app
-RUN npm install -g pnpm
-COPY --from=builder /app/apps/api/package.json ./package.json
-COPY --from=builder /app/apps/api/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
+
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/apps/api/dist ./apps/api/dist
+COPY --from=build /app/apps/api/package.json ./apps/api/package.json
+COPY --from=build /app/packages/db ./packages/db
 
 EXPOSE 4000
-CMD ["pnpm", "start"]
+CMD ["node", "apps/api/dist/server.js"]

@@ -1,19 +1,25 @@
-FROM node:20-alpine AS base
-
-FROM base AS builder
-RUN apk add --no-cache libc6-compat
+# Base stage
+FROM node:22-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+COPY . /app
 WORKDIR /app
-RUN npm install -g pnpm
-COPY . .
-RUN pnpm install --frozen-lockfile
+
+# Build stage
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run db:generate
 RUN pnpm --filter @smartscholar/web build
 
-FROM base AS runner
+# Production stage
+FROM node:22-slim AS production
 WORKDIR /app
-ENV NODE_ENV production
-COPY --from=builder /app/apps/web/public ./public
-COPY --from=builder /app/apps/web/.next/standalone ./
-COPY --from=builder /app/apps/web/.next/static ./.next/static
+
+ENV NODE_ENV=production
+COPY --from=build /app/apps/web/public ./apps/web/public
+COPY --from=build /app/apps/web/.next/standalone ./
+COPY --from=build /app/apps/web/.next/static ./apps/web/.next/static
 
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["node", "apps/web/server.js"]
