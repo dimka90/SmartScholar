@@ -527,14 +527,14 @@ AWS_SECRET_ACCESS_KEY= (optional)
 ### Feature 21: Security Hardening
 
 **Checklist:**
-- [ ] Rate limiting: use `@fastify/rate-limit` — 100 req/min for general routes, 10 req/min for AI chat/exam endpoints
-- [ ] Input validation: use `zod` schemas on all Fastify route inputs (body, params, query)
-- [ ] File upload security: validate MIME type server-side (not just extension); reject non-PDF files; limit file size to 50MB
-- [ ] Helmet: add `@fastify/helmet` for security headers
-- [ ] CORS: configure `@fastify/cors` to only allow frontend origin
-- [ ] SQL injection: Prisma's parameterized queries handle this; do not use raw SQL without parameterization
-- [ ] Secrets: ensure no API keys are logged or returned in error responses
-- [ ] Audit log: all admin actions (delete document, change user role, approve/reject post) are written to `ActivityLog`
+- [x] Rate limiting: use `@fastify/rate-limit` — 100 req/min for general routes, 10 req/min for AI chat/exam endpoints
+- [x] Input validation: use `zod` schemas on all Fastify route inputs (body, params, query)
+- [x] File upload security: validate MIME type server-side (not just extension); reject non-PDF files; limit file size to 50MB
+- [x] Helmet: add `@fastify/helmet` for security headers
+- [x] CORS: configure `@fastify/cors` to only allow frontend origin
+- [x] SQL injection: Prisma's parameterized queries handle this; do not use raw SQL without parameterization
+- [x] Secrets: ensure no API keys are logged or returned in error responses
+- [x] Audit log: all admin actions (delete document, change user role, approve/reject post) are written to `ActivityLog`
 
 ---
 
@@ -630,7 +630,7 @@ PHASE 6 — Access Control
 [x] Feature 20: Role-Based Access & Lecturer Portal
 
 PHASE 7 — Polish & Deployment
-[ ] Feature 21: Security Hardening
+[x] Feature 21: Security Hardening
 [ ] Feature 22: Search & Filtering
 [ ] Feature 23: Responsive UI & Accessibility
 [ ] Feature 24: Testing

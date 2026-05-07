@@ -5,15 +5,17 @@ import { Role } from '@smartscholar/db'
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   // Registration
-  fastify.post('/register', async (request, reply) => {
-    const registerSchema = z.object({
-      name: z.string(),
-      email: z.string().email(),
-      password: z.string().min(6),
-      role: z.nativeEnum(Role).optional()
-    })
-
-    const { name, email, password, role } = registerSchema.parse(request.body)
+  fastify.post('/register', {
+    schema: {
+      body: z.object({
+        name: z.string(),
+        email: z.string().email(),
+        password: z.string().min(6),
+        role: z.nativeEnum(Role).optional()
+      })
+    }
+  }, async (request, reply) => {
+    const { name, email, password, role } = request.body as any
 
     const existingUser = await fastify.prisma.user.findUnique({ where: { email } })
     if (existingUser) {
@@ -35,13 +37,15 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   })
 
   // Login
-  fastify.post('/login', async (request, reply) => {
-    const loginSchema = z.object({
-      email: z.string().email(),
-      password: z.string()
-    })
-
-    const { email, password } = loginSchema.parse(request.body)
+  fastify.post('/login', {
+    schema: {
+      body: z.object({
+        email: z.string().email(),
+        password: z.string()
+      })
+    }
+  }, async (request, reply) => {
+    const { email, password } = request.body as any
 
     const user = await fastify.prisma.user.findUnique({ where: { email } })
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
