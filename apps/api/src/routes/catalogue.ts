@@ -17,7 +17,12 @@ const catalogueRoutes: FastifyPluginAsync = async (fastify) => {
         level: level ? parseInt(level) : undefined,
         semester: semester ? parseInt(semester) : undefined
       },
-      include: { department: true }
+      include: { 
+        department: true,
+        _count: {
+          select: { extractedQuestions: true, documents: true }
+        }
+      }
     })
   })
 }

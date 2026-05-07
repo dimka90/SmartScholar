@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from 'fastify'
 import path from 'node:path'
 import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload'
+import documentFileRoute from './routes/documents/file'
 
 export type AppOptions = {
   // Place your custom options here
@@ -15,6 +16,10 @@ const app: FastifyPluginAsync<AppOptions> = async (
     dir: path.join(__dirname, 'plugins'),
     options: opts
   })
+
+  // Public routes (no auth) — must be registered BEFORE the autoload routes
+  // so they are outside the authenticated route scopes
+  fastify.register(documentFileRoute, { prefix: '/api/documents' })
 
   // This loads all plugins defined in routes
   fastify.register(AutoLoad, {

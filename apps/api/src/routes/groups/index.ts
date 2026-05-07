@@ -35,6 +35,20 @@ const groupRoutes: FastifyPluginAsync = async (fastify) => {
     })
   })
 
+  // Get single study group
+  fastify.get('/:id', async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const group = await fastify.prisma.studyGroup.findUnique({
+      where: { id },
+      include: {
+        course: { select: { code: true } },
+        members: { select: { name: true, avatarUrl: true } }
+      }
+    })
+    if (!group) return reply.status(404).send({ message: 'Group not found' })
+    return group
+  })
+
   // Join a group
   fastify.post('/:id/join', async (request) => {
     const { id } = request.params as { id: string }

@@ -16,19 +16,34 @@ const forumRoutes: FastifyPluginAsync = async (fastify) => {
     const { courseId, title, content, tags } = schema.parse(request.body)
 
     // AI Moderation
-    const moderation = await fastify.openai.moderations.create({ input: `${title}\n${content}` })
-    const isFlagged = moderation.results[0].flagged
+    let isFlagged = false
+    try {
+      const moderation = await fastify.openai.moderations.create({ input: `${title}\n${content}` })
+      isFlagged = moderation.results[0].flagged
+    } catch (err) {
+      fastify.log.error('OpenAI moderation failed', err)
+      // Default to unflagged if moderation API fails
+    }
 
-    const post = await fastify.prisma.forumPost.create({
-      data: {
-        userId: request.user.id,
-        courseId,
-        title,
-        content,
-        tags: tags || [],
-        isFlagged,
-        isApproved: !isFlagged
-      }
+    const post = await fastify.prisma.$transaction(async (tx) => {
+      const newPost = await tx.forumPost.create({
+        data: {
+          userId: request.user.id,
+          courseId,
+          title,
+          content,
+          tags: tags || [],
+          isFlagged,
+          isApproved: !isFlagged
+        }
+      })
+
+      await tx.user.update({
+        where: { id: request.user.id },
+        data: { points: { increment: 5 } }
+      })
+
+      return newPost
     })
 
     return post
@@ -68,11 +83,34 @@ const forumRoutes: FastifyPluginAsync = async (fastify) => {
     const { id: postId } = request.params as { id: string }
     const { content } = request.body as { content: string }
 
-    return fastify.prisma.forumReply.create({
-      data: {
-        postId,
-        userId: request.user.id,
-        content
+    return fastify.prisma.$transaction(async (tx) => {
+      const reply = await tx.forumReply.create({
+        data: {
+          postId,
+          userId: request.user.id,
+          content
+        }
+      })
+
+      await tx.user.update({
+        where: { id: request.user.id },
+        data: { points: { increment: 2 } }
+      })
+
+      return reply
+    })
+  })
+
+  // Get Leaderboard
+  fastify.get('/leaderboard', async () => {
+    return fastify.prisma.user.findMany({
+      orderBy: { points: 'desc' },
+      take: 5,
+      select: {
+        id: true,
+        name: true,
+        avatarUrl: true,
+        points: true
       }
     })
   })

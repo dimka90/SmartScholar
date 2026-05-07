@@ -47,6 +47,15 @@ const examRoutes: FastifyPluginAsync = async (fastify) => {
     return { message: `${questions.length} questions extracted` }
   })
 
+  // Get user's exam sessions
+  fastify.get('/sessions', async (request) => {
+    return fastify.prisma.examSession.findMany({
+      where: { userId: request.user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 20
+    })
+  })
+
   // Start exam session
   fastify.post('/sessions', async (request) => {
     const { courseId } = request.body as { courseId: string }

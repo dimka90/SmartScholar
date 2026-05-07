@@ -18,26 +18,45 @@ type Document = {
   summaryCache?: Summary
 }
 
+import { useSession } from 'next-auth/react'
+
 export default function DocumentDetailPage() {
+  const { data: session } = useSession()
   const { id } = useParams()
   const [doc, setDoc] = useState<Document | null>(null)
   const [loading, setLoading] = useState(true)
   const [summarizing, setSummarizing] = useState(false)
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/${id}`)
+    if (!session?.user || !id) return
+
+    const headers = {
+      'Authorization': `Bearer ${(session.user as any).accessToken}`
+    }
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/${id}`, { headers })
       .then(res => res.json())
       .then(data => {
-        setDoc(data)
+        if (data?.id) setDoc(data)
         setLoading(false)
       })
-  }, [id])
+      .catch(err => {
+        console.error('Document fetch error:', err)
+        setLoading(false)
+      })
+  }, [id, session])
 
   const generateSummary = async () => {
+    if (!session?.user || summarizing || !!doc?.summaryCache) return
     setSummarizing(true)
+    const headers = {
+      'Authorization': `Bearer ${(session.user as any).accessToken}`
+    }
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/${id}/summarize`, {
-        method: 'POST'
+        method: 'POST',
+        headers
       })
       const summary = await res.json()
       setDoc(prev => prev ? { ...prev, summaryCache: summary } : null)
@@ -73,12 +92,13 @@ export default function DocumentDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Document Viewer Placeholder */}
-        <div className="lg:col-span-2 aspect-[3/4] bg-white dark:bg-zinc-900 rounded-3xl border-4 border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col items-center justify-center p-12 text-center space-y-4">
-          <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center">
-            <FileText className="w-10 h-10 opacity-20" />
-          </div>
-          <p className="text-zinc-500 max-w-xs">PDF Viewer would be embedded here for real document interaction.</p>
+        {/* Document Viewer */}
+        <div className="lg:col-span-2 aspect-[3/4] bg-white dark:bg-zinc-900 rounded-3xl border-4 border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden relative">
+          <iframe 
+            src={`${process.env.NEXT_PUBLIC_API_URL}/documents/${id}/file?token=${(session?.user as any).accessToken}`}
+            className="w-full h-full border-none"
+            title={doc.title}
+          />
         </div>
 
         {/* AI Sidebar */}

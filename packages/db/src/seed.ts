@@ -8,23 +8,29 @@ async function main() {
 
   // 1. Create Departments
   const science = await prisma.department.upsert({
-    where: { name: 'Faculty of Science' },
+    where: { code: 'SCI' },
     update: {},
-    create: { name: 'Faculty of Science' }
+    create: { 
+      name: 'Faculty of Science',
+      code: 'SCI'
+    }
   })
 
   const gst = await prisma.department.upsert({
-    where: { name: 'General Studies' },
+    where: { code: 'GST' },
     update: {},
-    create: { name: 'General Studies' }
+    create: { 
+      name: 'General Studies',
+      code: 'GST'
+    }
   })
 
   // 2. Create Courses
   const courses = [
-    { code: 'CSC101', name: 'Introduction to Computer Science', deptId: science.id },
-    { code: 'CSC401', name: 'Artificial Intelligence', deptId: science.id },
-    { code: 'GST101', name: 'Use of English', deptId: gst.id },
-    { code: 'GST102', name: 'Philosophy and Logic', deptId: gst.id },
+    { code: 'CSC101', name: 'Introduction to Computer Science', deptId: science.id, level: 100, semester: 1 },
+    { code: 'CSC401', name: 'Artificial Intelligence', deptId: science.id, level: 400, semester: 1 },
+    { code: 'GST101', name: 'Use of English', deptId: gst.id, level: 100, semester: 1 },
+    { code: 'GST102', name: 'Philosophy and Logic', deptId: gst.id, level: 100, semester: 2 },
   ]
 
   for (const c of courses) {
@@ -34,7 +40,9 @@ async function main() {
       create: {
         code: c.code,
         name: c.name,
-        departmentId: c.deptId
+        departmentId: c.deptId,
+        level: c.level,
+        semester: c.semester
       }
     })
   }
@@ -69,9 +77,9 @@ async function main() {
 
   // 5. Create Badges
   const badges = [
-    { name: 'Scholar', description: 'Earned 500 points', iconUrl: '/badges/scholar.png' },
-    { name: 'Fast Learner', description: 'Passed 5 mock exams', iconUrl: '/badges/fast.png' },
-    { name: 'Helper', description: 'Answered 10 forum posts', iconUrl: '/badges/helper.png' },
+    { name: 'Scholar', description: 'Earned 500 points', iconUrl: '/badges/scholar.png', criteria: { points: 500 } },
+    { name: 'Fast Learner', description: 'Passed 5 mock exams', iconUrl: '/badges/fast.png', criteria: { exams: 5 } },
+    { name: 'Helper', description: 'Answered 10 forum posts', iconUrl: '/badges/helper.png', criteria: { replies: 10 } },
   ]
 
   for (const b of badges) {

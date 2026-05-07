@@ -30,7 +30,10 @@ type Group = {
   members: { name: string }[]
 }
 
+import { useSession } from 'next-auth/react'
+
 export default function GroupChatPage() {
+  const { data: session } = useSession()
   const { id } = useParams()
   const router = useRouter()
   const [group, setGroup] = useState<Group | null>(null)
@@ -42,16 +45,25 @@ export default function GroupChatPage() {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (!session?.user || !id) return
+
+    const headers = {
+      'Authorization': `Bearer ${(session.user as any).accessToken}`
+    }
+
     // Fetch group details and messages
     Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups/${id}`).then(res => res.json()),
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups/${id}/messages`).then(res => res.json())
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups/${id}`, { headers }).then(res => res.json()),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups/${id}/messages`, { headers }).then(res => res.json())
     ]).then(([groupData, messagesData]) => {
-      setGroup(groupData)
-      setMessages(messagesData)
+      if (groupData?.id) setGroup(groupData)
+      setMessages(Array.isArray(messagesData) ? messagesData : [])
+      setLoading(false)
+    }).catch(err => {
+      console.error('Group fetch error:', err)
       setLoading(false)
     })
-  }, [id])
+  }, [id, session])
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -61,22 +73,31 @@ export default function GroupChatPage() {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim() || submitting) return
+    if (!input.trim() || submitting || !session?.user) return
 
     setSubmitting(true)
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups/${id}/messages`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: input })
-    })
-
-    if (res.ok) {
-      const msg = await res.json()
-      // In real app, Socket.IO would handle this. For now, we update local state
-      setMessages([...messages, { ...msg, user: { name: 'You', avatarUrl: null } }])
-      setInput('')
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${(session.user as any).accessToken}`
     }
-    setSubmitting(false)
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups/${id}/messages`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ content: input })
+      })
+
+      if (res.ok) {
+        const msg = await res.json()
+        setMessages([...messages, { ...msg, user: { name: session.user.name || 'You', avatarUrl: null } }])
+        setInput('')
+      }
+    } catch (err) {
+      console.error('Failed to send message:', err)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin" /></div>

@@ -29,7 +29,10 @@ type Course = {
   code: string
 }
 
+import { useSession } from 'next-auth/react'
+
 export default function ChatPage() {
+  const { data: session } = useSession()
   const [sessions, setSessions] = useState<Session[]>([])
   const [activeSession, setActiveSession] = useState<Session | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -42,29 +45,40 @@ export default function ChatPage() {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    console.log('Session data:', session)
+    if (!session?.user) return
+
+    const headers = {
+      'Authorization': `Bearer ${(session.user as any).accessToken}`
+    }
+
     // Fetch courses
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`, { headers })
       .then(res => res.json())
       .then(data => {
-        setCourses(data)
-        if (data.length > 0) setSelectedCourse(data[0].id)
+        const coursesData = Array.isArray(data) ? data : []
+        setCourses(coursesData)
+        if (coursesData.length > 0) setSelectedCourse(coursesData[0].id)
       })
 
     // Fetch sessions
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/sessions`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/sessions`, { headers })
       .then(res => res.json())
-      .then(setSessions)
-  }, [])
+      .then(data => setSessions(Array.isArray(data) ? data : []))
+  }, [session])
 
   useEffect(() => {
-    if (activeSession) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/sessions/${activeSession.id}/messages`)
+    if (activeSession && session?.user) {
+      const headers = {
+        'Authorization': `Bearer ${(session.user as any).accessToken}`
+      }
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/sessions/${activeSession.id}/messages`, { headers })
         .then(res => res.json())
-        .then(setMessages)
+        .then(data => setMessages(Array.isArray(data) ? data : []))
     } else {
       setMessages([])
     }
-  }, [activeSession])
+  }, [activeSession, session])
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -73,10 +87,17 @@ export default function ChatPage() {
   }, [messages, streamingText])
 
   const createSession = async () => {
+    if (!session?.user) return
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${(session.user as any).accessToken}`
+    }
+
     const course = courses.find(c => c.id === selectedCourse)
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/sessions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
         courseId: selectedCourse,
         title: `Chat about ${course?.code}`
@@ -105,7 +126,10 @@ export default function ChatPage() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/sessions/${activeSession.id}/messages`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(session?.user as any).accessToken}`
+        },
         body: JSON.stringify({ content: input })
       })
 

@@ -15,6 +15,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           headers: { 'Content-Type': 'application/json' }
         })
         const data = await res.json()
+        console.log('API Login Response:', data)
 
         if (res.ok && data.user) {
           return { ...data.user, accessToken: data.token }

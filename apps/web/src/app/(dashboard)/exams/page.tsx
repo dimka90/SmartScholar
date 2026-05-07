@@ -20,30 +20,47 @@ type ExamSession = {
   course: { code: string }
 }
 
+import { useSession } from 'next-auth/react'
+
 export default function ExamsLobbyPage() {
+  const { data: session } = useSession()
   const [courses, setCourses] = useState<Course[]>([])
   const [pastExams, setPastExams] = useState<ExamSession[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!session?.user) return
+
+    const headers = {
+      'Authorization': `Bearer ${(session.user as any).accessToken}`
+    }
+
     Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`).then(res => res.json()),
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/sessions`).then(res => res.json())
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`, { headers }).then(res => res.json()),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/sessions`, { headers }).then(res => res.json())
     ]).then(([coursesData, examsData]) => {
-      setCourses(coursesData)
-      setPastExams(examsData)
+      setCourses(Array.isArray(coursesData) ? coursesData : [])
+      setPastExams(Array.isArray(examsData) ? examsData : [])
+      setLoading(false)
+    }).catch(err => {
+      console.error('Exams fetch error:', err)
       setLoading(false)
     })
-  }, [])
+  }, [session])
 
   const startExam = async (courseId: string) => {
+    if (!session?.user) return
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/sessions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${(session.user as any).accessToken}`
+      },
       body: JSON.stringify({ courseId })
     })
-    const session = await res.json()
-    window.location.href = `/exams/${session.id}`
+    const session_data = await res.json()
+    window.location.href = `/exams/${session_data.id}`
   }
 
   if (loading) return <div className="p-8">Loading...</div>

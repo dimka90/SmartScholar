@@ -15,7 +15,10 @@ import {
   TrendingUp
 } from 'lucide-react'
 
+import { useSession } from 'next-auth/react'
+
 export default function DashboardPage() {
+  const { data: session } = useSession()
   const [stats, setStats] = useState({
     points: 0,
     rank: 0,
@@ -26,21 +29,30 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!session?.user) return
+
+    const headers = {
+      'Authorization': `Bearer ${(session.user as any).accessToken}`
+    }
+
     // Fetch stats and recent activity
     Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/me`).then(res => res.json()),
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/sessions`).then(res => res.json())
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/me`, { headers }).then(res => res.json()),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/sessions`, { headers }).then(res => res.json())
     ]).then(([userData, examsData]) => {
       setStats({
-        points: userData.points,
-        rank: userData.rank,
+        points: userData?.points || 0,
+        rank: userData?.rank || 0,
         docsProcessed: 42, // Mock for now
-        examPasses: examsData.filter((e: any) => e.score / e.totalQuestions >= 0.7).length
+        examPasses: Array.isArray(examsData) ? examsData.filter((e: any) => e.score / e.totalQuestions >= 0.7).length : 0
       })
-      setRecentExams(examsData.slice(0, 3))
+      setRecentExams(Array.isArray(examsData) ? examsData.slice(0, 3) : [])
+      setLoading(false)
+    }).catch(err => {
+      console.error('Dashboard fetch error:', err)
       setLoading(false)
     })
-  }, [])
+  }, [session])
 
   if (loading) return <div className="p-8">Loading...</div>
 

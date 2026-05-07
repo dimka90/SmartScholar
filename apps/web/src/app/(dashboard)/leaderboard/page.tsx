@@ -17,21 +17,33 @@ type User = {
   badges: { badge: Badge }[]
 }
 
+import { useSession } from 'next-auth/react'
+
 export default function LeaderboardPage() {
+  const { data: session } = useSession()
   const [leaderboard, setLeaderboard] = useState<User[]>([])
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!session?.user) return
+
+    const headers = {
+      'Authorization': `Bearer ${(session.user as any).accessToken}`
+    }
+
     Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard`).then(res => res.json()),
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/me`).then(res => res.json())
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard`, { headers }).then(res => res.json()),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/me`, { headers }).then(res => res.json())
     ]).then(([lbData, meData]) => {
-      setLeaderboard(lbData)
+      setLeaderboard(Array.isArray(lbData) ? lbData : [])
       setCurrentUser(meData)
       setLoading(false)
+    }).catch(err => {
+      console.error('Leaderboard fetch error:', err)
+      setLoading(false)
     })
-  }, [])
+  }, [session])
 
   if (loading) return <div className="p-8">Loading leaderboard...</div>
 

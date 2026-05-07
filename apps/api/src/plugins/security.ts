@@ -6,13 +6,21 @@ import cors from '@fastify/cors'
 export default fp(async (fastify) => {
   // 1. Helmet for security headers
   await fastify.register(helmet, {
-    contentSecurityPolicy: process.env.NODE_ENV === 'production'
+    contentSecurityPolicy: process.env.NODE_ENV === 'production',
+    // Allow PDFs to be embedded in iframes from the same origin (including cross-port in dev)
+    frameguard: false
   })
 
   // 2. CORS configuration
   await fastify.register(cors, {
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || true,
-    credentials: true
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  })
+  
+  fastify.addHook('onRequest', async (request) => {
+    console.log('Request Origin:', request.headers.origin)
   })
 
   // 3. Rate limiting (General)

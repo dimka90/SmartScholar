@@ -15,18 +15,42 @@ type Post = {
   _count: { replies: number }
 }
 
+type LeaderboardUser = {
+  id: string
+  name: string
+  avatarUrl: string | null
+  points: number
+}
+
+import { useSession } from 'next-auth/react'
+
 export default function ForumLobbyPage() {
+  const { data: session } = useSession()
   const [posts, setPosts] = useState<Post[]>([])
+  const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/forum/posts`)
-      .then(res => res.json())
-      .then(data => {
-        setPosts(data)
+    if (!session?.user) return
+
+    const headers = {
+      'Authorization': `Bearer ${(session.user as any).accessToken}`
+    }
+
+    Promise.all([
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/forum/posts`, { headers }).then(res => res.json()),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/forum/leaderboard`, { headers }).then(res => res.json())
+    ])
+      .then(([postsData, leaderboardData]) => {
+        setPosts(Array.isArray(postsData) ? postsData : [])
+        setLeaderboard(Array.isArray(leaderboardData) ? leaderboardData : [])
         setLoading(false)
       })
-  }, [])
+      .catch(err => {
+        console.error('Forum fetch error:', err)
+        setLoading(false)
+      })
+  }, [session])
 
   if (loading) return <div className="p-8">Loading forum...</div>
 
@@ -132,17 +156,20 @@ export default function ForumLobbyPage() {
             <Users className="w-10 h-10" />
             <h3 className="text-xl font-black">Top Contributors</h3>
             <div className="space-y-4">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="flex items-center gap-3">
+              {leaderboard.map(user => (
+                <div key={user.id} className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-[10px]">
-                    JD
+                    {user.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold truncate">John Doe</p>
-                    <p className="text-[10px] opacity-70">1.2k Karma</p>
+                    <p className="text-xs font-bold truncate">{user.name}</p>
+                    <p className="text-[10px] opacity-70">{user.points} Karma</p>
                   </div>
                 </div>
               ))}
+              {leaderboard.length === 0 && (
+                <p className="text-sm opacity-70">No contributors yet.</p>
+              )}
             </div>
           </div>
         </div>

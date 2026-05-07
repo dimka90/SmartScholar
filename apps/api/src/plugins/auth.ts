@@ -22,6 +22,7 @@ export default fp(async (fastify) => {
     try {
       await request.jwtVerify()
     } catch (err) {
+      console.error('JWT Verification Error:', err)
       reply.send(err)
     }
   })

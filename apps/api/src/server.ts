@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv'
+import path from 'node:path'
+dotenv.config({ path: path.join(__dirname, '../../../.env') })
 import Fastify from 'fastify'
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 import app from './app'

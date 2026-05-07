@@ -6,6 +6,8 @@ import { Role, DocumentType } from '@smartscholar/db'
 import { documentQueue } from '../../lib/queue'
 
 const documentRoutes: FastifyPluginAsync = async (fastify) => {
+  // ── All routes below require authentication via preHandler ──
+  // Note: The /:id/file route lives in file.ts, registered at the app level with no auth.
   fastify.addHook('preHandler', fastify.authenticate)
 
   // Upload document
@@ -65,6 +67,23 @@ const documentRoutes: FastifyPluginAsync = async (fastify) => {
       include: { course: true, uploadedBy: { select: { name: true } } }
     })
   })
+
+  // Get single document
+  fastify.get('/:id', async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const document = await fastify.prisma.document.findUnique({
+      where: { id },
+      include: { 
+        course: { select: { code: true, name: true } }, 
+        uploadedBy: { select: { name: true } } 
+      }
+    })
+    if (!document) return reply.status(404).send({ message: 'Document not found' })
+    return document
+  })
+
+
+  // Summarize document
 
   // Summarize document
   fastify.post('/:id/summarize', async (request, reply) => {

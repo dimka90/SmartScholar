@@ -1,0 +1,29 @@
+
+> SmartScholar@1.0.0 dev /home/cyberking/Developments/400L/SmartScholar
+> pnpm --filter '*' --parallel dev
+
+Scope: all 6 workspace projects
+apps/api dev$ ts-node-dev --respawn --transpile-only src/server.ts
+apps/web dev$ next dev
+apps/api dev: [INFO] 14:49:16 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+apps/api dev: ◇ injected env (12) from ../../.env // tip: ⌘ suppress logs { quiet: true }
+apps/web dev: ⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
+apps/web dev: ▲ Next.js 16.2.5 (Turbopack)
+apps/web dev: - Local:         http://localhost:3001
+apps/web dev: - Network:       http://192.168.173.148:3001
+apps/web dev: - Environments: .env
+apps/web dev: ✓ Ready in 542ms
+apps/api dev: JWT Secret (first 5 chars): V3K+6
+apps/web dev: ⨯ Another next dev server is already running.
+apps/web dev: - Local:        http://localhost:3000
+apps/web dev: - PID:          428181
+apps/web dev: - Dir:          /home/cyberking/Developments/400L/SmartScholar/apps/web
+apps/web dev: - Log:          .next/dev/logs/next-development.log
+apps/web dev: Run kill 428181 to stop it.
+apps/api dev: {"level":50,"time":1778161757879,"pid":437650,"hostname":"cyberking","err":{"type":"Error","message":"listen EADDRINUSE: address already in use 0.0.0.0:4000","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:4000\n    at Server.setupListenHandle [as _listen2] (node:net:1912:16)\n    at listenInCluster (node:net:1969:12)\n    at node:net:2178:7\n    at processTicksAndRejections (node:internal/process/task_queues:90:21)","code":"EADDRINUSE","errno":-98,"syscall":"listen","address":"0.0.0.0","port":4000},"msg":"listen EADDRINUSE: address already in use 0.0.0.0:4000"}
+apps/web dev: [?25h
+apps/web dev: Failed
+/home/cyberking/Developments/400L/SmartScholar/apps/web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @smartscholar/web@0.1.0 dev: `next dev`
+Exit status 1
+ ELIFECYCLE  Command failed with exit code 1.
