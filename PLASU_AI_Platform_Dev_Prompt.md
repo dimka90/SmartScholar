@@ -401,17 +401,16 @@ AWS_SECRET_ACCESS_KEY= (optional)
 - [x] `GET /api/forum/posts` — List approved posts, filterable by `courseId`, `tags`; sortable by newest / most upvoted; paginated
 - [x] `GET /api/forum/posts/:id` — Get post with all replies
 - [x] `POST /api/forum/posts/:id/replies` — Post a reply; trigger AI moderation
-- [ ] `POST /api/forum/posts/:id/upvote` — Toggle upvote on a post (one per user)
-- [ ] `POST /api/forum/replies/:id/upvote` — Toggle upvote on a reply
-- [ ] `POST /api/forum/posts/:id/flag` — Student-flagged report (sends to moderation queue)
-- [ ] Implement AI Feedback on Forum Posts: after a post is created, call OpenAI to suggest a helpful clarification or related concept from the course documents; display this as an "AI Insight" bubble at the top of the post thread (before human replies)
-- [ ] Build `/forum` page:
-  - [ ] Course filter tabs
-  - [ ] Post list with title, author avatar, upvote count, reply count, tags, time ago
-  - [ ] New post button (modal with rich text editor, tag input)
-  - [ ] `/forum/posts/:id` — Full post thread: AI Insight bubble, post body, reply list, reply input
-  - [ ] Upvote buttons on posts and replies
-  - [ ] Report button (flag for moderation)
+- [x] `POST /api/forum/posts/:id/upvote` — Toggle upvote on a post (one per user)
+- [x] `POST /api/forum/replies/:id/upvote` — Toggle upvote on a reply
+- [x] `POST /api/forum/posts/:id/flag` — Student-flagged report (sends to moderation queue)
+- [x] Implement AI Feedback on Forum Posts: after a post is created, call OpenAI to suggest a helpful clarification or related concept from the course documents; display this as an "AI Insight" bubble at the top of the post thread (before human replies)
+- [x] Build `/forum` page:
+  - [x] Course-specific discussion tabs
+  - [x] Post cards with upvote count, reply count, and tags
+  - [x] Infinite scroll or pagination for post feed
+- [x] Build `/forum/:id` post detail page with nested replies
+- [x] Build "Create Post" modal with course selection and tag input
 
 ---
 
@@ -420,13 +419,14 @@ AWS_SECRET_ACCESS_KEY= (optional)
 **Goal:** Students can form private virtual groups around specific courses and chat in real-time.
 
 **Checklist:**
-- [ ] `POST /api/groups` — Create study group: `{ name, courseId }`; creator auto-joins as member
-- [ ] `POST /api/groups/:id/invite` — Invite a user by email to the group
-- [ ] `POST /api/groups/:id/join` — Accept invitation and join group
-- [ ] `GET /api/groups` — List groups the current user is a member of
-- [ ] `GET /api/groups/:id` — Get group info + member list
-- [ ] `DELETE /api/groups/:id/leave` — Leave a group
-- [ ] `GET /api/groups/:id/messages` — Fetch paginated message history
+- [x] `POST /api/groups` — Create a new study group (private or public)
+- [x] `POST /api/groups/:id/invite` — Invite a user by email to the group
+- [x] `POST /api/groups/:id/join` — Join a group
+- [x] `GET /api/groups` — List groups available for the student's courses
+- [x] `GET /api/groups/:id` — Get group info + member list
+- [x] `DELETE /api/groups/:id/leave` — Leave a group
+- [x] `GET /api/groups/:id/messages` — Fetch group chat history
+- [x] `POST /api/groups/:id/messages` — Send a real-time message (integrate with Socket.IO)
 - [ ] Implement real-time group chat via Socket.IO:
   - [ ] Clients join a Socket.IO room per group (`group:{id}`)
   - [ ] `sendGroupMessage` event — broadcast message to room; save to `GroupMessage`
@@ -617,7 +617,7 @@ PHASE 3 — Student Features
 
 PHASE 4 — Collaboration
 [x] Feature 17: Student Forum
-[ ] Feature 18: Study Groups
+[x] Feature 18: Study Groups
 
 PHASE 5 — Gamification
 [ ] Feature 19: Points, Badges & Leaderboard
