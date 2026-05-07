@@ -322,12 +322,12 @@ AWS_SECRET_ACCESS_KEY= (optional)
 - Questions are stored in `ExamSession`
 
 **Checklist:**
-- [ ] `POST /api/admin/documents/:id/extract-questions` — Parse a PAST_QUESTION document's chunks and extract structured questions using OpenAI; store results as JSON in a new `ExtractedQuestion` model
-- [ ] Create `ExtractedQuestion` model: `id`, `documentId`, `question`, `options` (String[], for MCQ), `correctAnswer`, `explanation`, `difficulty` (ENUM: EASY, MEDIUM, HARD), `courseId`
-- [ ] `POST /api/exam/start` — Accept `courseId` and `questionCount` (default 10); randomly select questions from `ExtractedQuestion` for the course; create `ExamSession`; return shuffled questions WITHOUT correct answers
-- [ ] `POST /api/exam/sessions/:id/submit` — Accept student's answers; compute score; save to `ExamSession`; award points based on score; return detailed results with correct answers and explanations
-- [ ] `GET /api/exam/sessions` — List user's past exam sessions with scores
-- [ ] `GET /api/exam/sessions/:id` — Get full results of a completed session
+- [x] `POST /api/admin/documents/:id/extract-questions` — Parse a PAST_QUESTION document's chunks and extract structured questions using OpenAI; store results as JSON in a new `ExtractedQuestion` model
+- [x] Create `ExtractedQuestion` model: `id`, `documentId`, `question`, `options` (String[], for MCQ), `correctAnswer`, `explanation`, `difficulty` (ENUM: EASY, MEDIUM, HARD), `courseId`
+- [x] `POST /api/exam/start` — Accept `courseId` and `questionCount` (default 10); randomly select questions from `ExtractedQuestion` for the course; create `ExamSession`; return shuffled questions WITHOUT correct answers
+- [x] `POST /api/exam/sessions/:id/submit` — Accept student's answers; compute score; save to `ExamSession`; award points based on score; return detailed results with correct answers and explanations
+- [x] `GET /api/exam/sessions` — List user's past exam sessions with scores
+- [x] `GET /api/exam/sessions/:id` — Get full results of a completed session
 - [ ] Build `/exam` page:
   - [ ] Course + question count selector
   - [ ] Timer display (configurable, e.g., 1 minute per question)
@@ -610,7 +610,7 @@ PHASE 2 — Admin Features
 PHASE 3 — Student Features
 [x] Feature 11: AI Chat Interface (RAG)
 [x] Feature 12: AI-Powered Document Summaries
-[ ] Feature 13: Exam Simulation Mode
+[x] Feature 13: Exam Simulation Mode
 [ ] Feature 14: Bookmarking & Personal Notes
 [ ] Feature 15: Student Analytics Dashboard
 [ ] Feature 16: Personalized Study Recommendations
