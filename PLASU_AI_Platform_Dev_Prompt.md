@@ -285,13 +285,13 @@ AWS_SECRET_ACCESS_KEY= (optional)
 - [x] `DELETE /api/chat/sessions/:id` — Delete a chat session and its messages
 - [x] `POST /api/chat/sessions/:id/messages` — Send a message; trigger RAG pipeline; stream response using Fastify's reply streaming
 - [x] Enforce strict RAG grounding: if no relevant chunks found (similarity below threshold), respond with "I could not find an answer to this in the uploaded materials."
-- [ ] Build `/chat` page with:
-  - [ ] Course selector dropdown
-  - [ ] Chat session sidebar (list of past sessions, new session button)
-  - [ ] Message thread area with user and AI bubbles
-  - [ ] Streaming response display (typewriter effect)
-  - [ ] "Sources used" collapsible section below each AI response showing document names + page references
-  - [ ] Send input at bottom with keyboard shortcut (Enter to send, Shift+Enter for newline)
+- [x] Build `/chat` page with:
+  - [x] Course selector dropdown
+  - [x] Chat session sidebar (list of past sessions, new session button)
+  - [x] Message thread area with user and AI bubbles
+  - [x] Streaming response display (typewriter effect)
+  - [x] "Sources used" collapsible section below each AI response showing document names + page references
+  - [x] Send input at bottom with keyboard shortcut (Enter to send, Shift+Enter for newline)
 
 ---
 
@@ -300,12 +300,12 @@ AWS_SECRET_ACCESS_KEY= (optional)
 **Goal:** Students can generate instant summaries and key exam points from any document.
 
 **Checklist:**
-- [ ] `POST /api/documents/:id/summarize` — Retrieve all chunks for the document; call OpenAI to generate a structured summary with: Overview (2–3 sentences), Key Concepts (bullet list), Likely Exam Topics (bullet list); cache the result in the `Document` record (add `summaryCache` JSON field)
-- [ ] If summary already cached (and document version unchanged), return cached version without calling OpenAI again
-- [ ] Build document detail page `/documents/:id` with:
-  - [ ] Document viewer (PDF iframe embed or link)
-  - [ ] "Generate Summary" button with loading state
-  - [ ] Rendered summary with Overview, Key Concepts, Exam Topics sections
+- [x] `POST /api/documents/:id/summarize` — Retrieve all chunks for the document; call OpenAI to generate a structured summary with: Overview (2–3 sentences), Key Concepts (bullet list), Likely Exam Topics (bullet list); cache the result in the `Document` record (add `summaryCache` JSON field)
+- [x] If summary already cached (and document version unchanged), return cached version without calling OpenAI again
+- [x] Build document detail page `/documents/:id` with:
+  - [x] Document viewer (PDF iframe embed or link)
+  - [x] "Generate Summary" button with loading state
+  - [x] Rendered summary with Overview, Key Concepts, Exam Topics sections
   - [ ] "Download Summary" button (generates a plain-text or PDF summary file)
 - [ ] Show a "Summary available" badge on document cards where summary has been generated
 
@@ -609,7 +609,7 @@ PHASE 2 — Admin Features
 
 PHASE 3 — Student Features
 [x] Feature 11: AI Chat Interface (RAG)
-[ ] Feature 12: AI-Powered Document Summaries
+[x] Feature 12: AI-Powered Document Summaries
 [ ] Feature 13: Exam Simulation Mode
 [ ] Feature 14: Bookmarking & Personal Notes
 [ ] Feature 15: Student Analytics Dashboard

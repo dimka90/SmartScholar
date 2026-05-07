@@ -1,8 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 const chatRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.addHook('preHandler', fastify.authenticate)
@@ -42,7 +39,7 @@ const chatRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     // 1. Embed query
-    const embeddingRes = await openai.embeddings.create({
+    const embeddingRes = await fastify.openai.embeddings.create({
       model: 'text-embedding-3-small',
       input: content
     })
@@ -73,8 +70,8 @@ const chatRoutes: FastifyPluginAsync = async (fastify) => {
 
     const context = chunks.map(c => c.content).join('\n\n')
 
-    // 3. Call OpenAI for grounded response
-    const response = await openai.chat.completions.create({
+    // 3. Call OpenAI for grounded response (Streaming)
+    const stream = await fastify.openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         {
@@ -88,26 +85,36 @@ const chatRoutes: FastifyPluginAsync = async (fastify) => {
         },
         { role: 'user', content }
       ],
-      stream: false // Streaming can be implemented later with reply.raw
+      stream: true
     })
 
-    const answer = response.choices[0].message.content
+    reply.raw.setHeader('Content-Type', 'text/event-stream')
+    reply.raw.setHeader('Cache-Control', 'no-cache')
+    reply.raw.setHeader('Connection', 'keep-alive')
+
+    let fullAnswer = ''
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content || ''
+      fullAnswer += text
+      reply.raw.write(`data: ${JSON.stringify({ text })}\n\n`)
+    }
 
     // 4. Save messages
     await fastify.prisma.chatMessage.create({
       data: { sessionId, role: 'user', content }
     })
 
-    const assistantMsg = await fastify.prisma.chatMessage.create({
+    await fastify.prisma.chatMessage.create({
       data: {
         sessionId,
         role: 'assistant',
-        content: answer || '',
+        content: fullAnswer,
         sourcesUsed: chunks.map(c => ({ documentId: c.documentId, chunkIndex: c.chunkIndex }))
       }
     })
 
-    return assistantMsg
+    reply.raw.end()
+    return reply // Required to prevent Fastify from trying to send another response
   })
 }
 

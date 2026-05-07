@@ -1,8 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 const forumRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.addHook('preHandler', fastify.authenticate)
@@ -19,7 +16,7 @@ const forumRoutes: FastifyPluginAsync = async (fastify) => {
     const { courseId, title, content, tags } = schema.parse(request.body)
 
     // AI Moderation
-    const moderation = await openai.moderations.create({ input: `${title}\n${content}` })
+    const moderation = await fastify.openai.moderations.create({ input: `${title}\n${content}` })
     const isFlagged = moderation.results[0].flagged
 
     const post = await fastify.prisma.forumPost.create({

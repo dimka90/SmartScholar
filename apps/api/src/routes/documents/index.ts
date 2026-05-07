@@ -66,6 +66,43 @@ const documentRoutes: FastifyPluginAsync = async (fastify) => {
     })
   })
 
+  // Summarize document
+  fastify.post('/:id/summarize', async (request, reply) => {
+    const { id } = request.params as { id: string }
+
+    const document = await fastify.prisma.document.findUnique({
+      where: { id },
+      include: { chunks: { orderBy: { chunkIndex: 'asc' }, take: 10 } } // Take first 10 chunks for summary
+    })
+
+    if (!document) return reply.status(404).send({ message: 'Document not found' })
+    if (document.summaryCache) return document.summaryCache
+
+    const context = document.chunks.map(c => c.content).join('\n\n')
+
+    const response = await fastify.openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'system',
+          content: `Generate a structured academic summary for this document. 
+          Return JSON format: { "overview": "...", "keyConcepts": ["...", "..."], "examTopics": ["...", "..."] }`
+        },
+        { role: 'user', content: context }
+      ],
+      response_format: { type: 'json_object' }
+    })
+
+    const summary = JSON.parse(response.choices[0].message.content || '{}')
+
+    await fastify.prisma.document.update({
+      where: { id },
+      data: { summaryCache: summary }
+    })
+
+    return summary
+  })
+
   // Delete document (soft delete)
   fastify.delete('/:id', async (request) => {
     const { id } = request.params as { id: string }
