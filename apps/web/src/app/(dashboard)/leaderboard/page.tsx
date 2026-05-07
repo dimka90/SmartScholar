@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Trophy, Medal, Star, Target, Zap, Users, ChevronUp, Award } from 'lucide-react'
+import { Trophy, Medal, Star, Target, Zap, Users, ChevronUp, Award, MessageSquare } from 'lucide-react'
 
 type Badge = {
   id: string
