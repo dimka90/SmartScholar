@@ -620,7 +620,7 @@ PHASE 4 — Collaboration
 [x] Feature 18: Study Groups
 
 PHASE 5 — Gamification
-[ ] Feature 19: Points, Badges & Leaderboard
+[x] Feature 19: Points, Badges & Leaderboard
 
 PHASE 6 — Access Control
 [ ] Feature 20: Role-Based Access & Lecturer Portal
