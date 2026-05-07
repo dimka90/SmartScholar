@@ -9,7 +9,7 @@ const lecturerRoutes: FastifyPluginAsync = async (fastify) => {
     // In a real app, we'd filter by lecturerId. For now, show all courses
     return fastify.prisma.course.findMany({
       include: {
-        _count: { select: { documents: true, exams: true } },
+        _count: { select: { documents: true, examSessions: true } },
         department: { select: { name: true } }
       }
     })

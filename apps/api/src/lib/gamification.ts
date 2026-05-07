@@ -22,7 +22,7 @@ export async function awardPoints(userId: string, amount: number, action: string
 async function checkAndAwardBadges(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: { _count: { select: { chatSessions: true, examSessions: true, badges: true } } }
+    include: { badges: true, _count: { select: { chatSessions: true, examSessions: true } } }
   })
 
   if (!user) return

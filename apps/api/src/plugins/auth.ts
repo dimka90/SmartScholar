@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import fp from 'fastify-plugin'
-import { Role } from '@prisma/client'
+import { Role } from '@smartscholar/db'
 
 declare module 'fastify' {
   interface FastifyInstance {
