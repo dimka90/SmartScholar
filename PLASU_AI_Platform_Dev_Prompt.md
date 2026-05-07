@@ -543,13 +543,13 @@ AWS_SECRET_ACCESS_KEY= (optional)
 **Goal:** Students can quickly find documents, forum posts, and questions by keyword or filter.
 
 **Checklist:**
-- [ ] `GET /api/search?q=&type=document|forum|question&courseId=` — Full-text search across document titles/tags, forum post titles/content, and extracted question text; return ranked results by type
-- [ ] Implement PostgreSQL full-text search using `tsvector` columns on `Document.title`, `ForumPost.title + content`, `ExtractedQuestion.question`
-- [ ] Build global search bar in the navbar:
-  - [ ] Dropdown shows instant results as user types (debounced, 300ms)
-  - [ ] Results grouped by type (Documents, Forum, Questions)
-  - [ ] "See all results" link to full `/search?q=` page
-- [ ] Full search results page with filter tabs and pagination
+- [x] `GET /api/search?q=&type=document|forum|question&courseId=` — Full-text search across document titles/tags, forum post titles/content, and extracted question text; return ranked results by type
+- [x] Implement PostgreSQL full-text search using `tsvector` columns on `Document.title`, `ForumPost.title + content`, `ExtractedQuestion.question`
+- [x] Build global search bar in the navbar:
+  - [x] Dropdown shows instant results as user types (debounced, 300ms)
+  - [x] Results grouped by type (Documents, Forum, Questions)
+  - [x] "See all results" link to full `/search?q=` page
+- [x] Full search results page with filter tabs and pagination
 
 ---
 
@@ -631,7 +631,7 @@ PHASE 6 — Access Control
 
 PHASE 7 — Polish & Deployment
 [x] Feature 21: Security Hardening
-[ ] Feature 22: Search & Filtering
+[x] Feature 22: Search & Filtering
 [ ] Feature 23: Responsive UI & Accessibility
 [ ] Feature 24: Testing
 [ ] Feature 25: Deployment & DevOps
