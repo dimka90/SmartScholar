@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "pnpm --filter '*' --parallel dev",
+    "build": "pnpm --filter '*' build",
     "db:generate": "pnpm --filter @smartscholar/db run db:generate",
     "db:migrate": "pnpm --filter @smartscholar/db run db:migrate",
+    "db:seed": "pnpm --filter @smartscholar/db run db:seed",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
