@@ -9,6 +9,7 @@
     "db:generate": "pnpm --filter @smartscholar/db run db:generate",
     "db:migrate": "pnpm --filter @smartscholar/db run db:migrate",
     "db:seed": "pnpm --filter @smartscholar/db run db:seed",
+    "db:studio": "pnpm --filter @smartscholar/db run db:studio",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
