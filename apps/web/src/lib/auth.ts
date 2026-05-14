@@ -1,6 +1,18 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string
+      name: string
+      email: string
+      role: string
+      accessToken: string
+    }
+  }
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
@@ -15,7 +27,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           headers: { 'Content-Type': 'application/json' }
         })
         const data = await res.json()
-        console.log('API Login Response:', data)
 
         if (res.ok && data.user) {
           return { ...data.user, accessToken: data.token }
@@ -27,14 +38,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.user = user
+        token.id = user.id
+        token.name = user.name
+        token.email = user.email
+        token.role = (user as any).role
+        token.accessToken = (user as any).accessToken
       }
       return token
     },
     async session({ session, token }) {
-      if (token.user) {
-        session.user = token.user as any
-      }
+      session.user.id = token.id as string
+      session.user.name = token.name as string
+      session.user.email = token.email as string
+      session.user.role = token.role as string
+      session.user.accessToken = token.accessToken as string
       return session
     }
   },

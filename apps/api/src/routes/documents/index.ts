@@ -99,20 +99,14 @@ const documentRoutes: FastifyPluginAsync = async (fastify) => {
 
     const context = document.chunks.map((c: any) => c.content).join('\n\n')
 
-    const response = await fastify.openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: `Generate a structured academic summary for this document. 
-          Return JSON format: { "overview": "...", "keyConcepts": ["...", "..."], "examTopics": ["...", "..."] }`
-        },
-        { role: 'user', content: context }
-      ],
-      response_format: { type: 'json_object' }
-    })
+    const response = await fastify.ai.chat(
+      `Generate a structured academic summary for this document. 
+      Return JSON format: { "overview": "...", "keyConcepts": ["...", "..."], "examTopics": ["...", "..."] }`,
+      [{ role: 'user', content: context }],
+      'json_object'
+    )
 
-    const summary = JSON.parse(response.choices[0].message.content || '{}')
+    const summary = JSON.parse(response || '{}')
 
     await fastify.prisma.document.update({
       where: { id },

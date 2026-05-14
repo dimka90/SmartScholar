@@ -19,11 +19,15 @@ declare module '@fastify/jwt' {
 
 export default fp(async (fastify) => {
   fastify.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
+    const authHeader = request.headers.authorization
+    if (!authHeader) {
+      return reply.status(401).send({ message: 'Missing Authorization header' })
+    }
     try {
       await request.jwtVerify()
-    } catch (err) {
-      console.error('JWT Verification Error:', err)
-      reply.send(err)
+    } catch (err: any) {
+      console.error('JWT Verification Error:', err?.message || err)
+      return reply.status(401).send({ message: 'Invalid or expired token' })
     }
   })
 

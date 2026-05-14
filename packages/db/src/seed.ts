@@ -1,4 +1,5 @@
 import { PrismaClient, Role } from '@prisma/client'
+import crypto from 'node:crypto'
 import bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()

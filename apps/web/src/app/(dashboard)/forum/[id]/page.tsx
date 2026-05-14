@@ -39,7 +39,7 @@ export default function ForumPostPage() {
   useEffect(() => {
     if (!session?.user) return
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/forum/posts/${id}`, { headers })
@@ -65,7 +65,7 @@ export default function ForumPostPage() {
 
     setSubmitting(true)
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`,
+      'Authorization': `Bearer ${session.user.accessToken}`,
       'Content-Type': 'application/json'
     }
 

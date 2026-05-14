@@ -7,11 +7,11 @@ export default fp(async (fastify) => {
   fastify.register(fastifyJwt, {
     secret: process.env.JWT_SECRET || 'supersecret',
     cookie: {
-      cookieName: 'refreshToken',
+      cookieName: 'token',
       signed: false
     },
     sign: {
-      expiresIn: '1d'
+      expiresIn: '7d'
     }
   })
 

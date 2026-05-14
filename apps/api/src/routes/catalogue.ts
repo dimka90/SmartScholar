@@ -5,6 +5,7 @@ const catalogueRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.get('/departments', async () => {
     return fastify.prisma.department.findMany({
+      where: { isActive: true },
       include: { _count: { select: { courses: true } } }
     })
   })
@@ -13,6 +14,7 @@ const catalogueRoutes: FastifyPluginAsync = async (fastify) => {
     const { departmentId, level, semester } = request.query as any
     return fastify.prisma.course.findMany({
       where: {
+        isActive: true,
         departmentId: departmentId || undefined,
         level: level ? parseInt(level) : undefined,
         semester: semester ? parseInt(semester) : undefined

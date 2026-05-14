@@ -1,63 +1,73 @@
 import { Worker, Job } from 'bullmq'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import pdf from 'pdf-parse'
+import { PDFParse } from 'pdf-parse'
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
 import OpenAI from 'openai'
 import { PrismaClient } from '@smartscholar/db'
 
 const prisma = new PrismaClient()
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+async function getEmbeddingClient() {
+  // 1. Try dedicated embedding provider (isEmbedProvider = true)
+  const embedProv = await prisma.aiProvider.findFirst({ where: { isEmbedProvider: true } })
+  if (embedProv?.embedModel) {
+    return { client: new OpenAI({ apiKey: embedProv.apiKey, baseURL: embedProv.baseUrl || undefined }), model: embedProv.embedModel }
+  }
+
+  // 2. Fall back to env var
+  if (process.env.OPENAI_API_KEY) {
+    return { client: new OpenAI({ apiKey: process.env.OPENAI_API_KEY }), model: 'text-embedding-3-small' }
+  }
+
+  throw new Error('No embedding provider configured. Set an AI provider with isEmbedProvider=true and an embedModel.')
+}
 
 export const ragWorker = new Worker(
   'document-processing',
   async (job: Job) => {
     const { documentId, filePath } = job.data
-    const absolutePath = path.join(__dirname, '../../../', filePath)
+    const absolutePath = path.join(__dirname, '../../', filePath)
 
     try {
-      // 0. Update status to processing
       await prisma.document.update({
         where: { id: documentId },
         data: { processingStatus: 'processing' }
       })
 
-      // 1. Extract text from PDF
       const dataBuffer = await fs.readFile(absolutePath)
-      const data = await (pdf as any)(dataBuffer)
-      const text = data.text
+      const parser = new PDFParse({ data: dataBuffer })
+      const info = await parser.getText()
+      const text = info.text
 
-      // 2. Chunk text
       const splitter = new RecursiveCharacterTextSplitter({
         chunkSize: 500,
         chunkOverlap: 50
       })
       const chunks = await splitter.splitText(text)
 
-      // 3. Generate embeddings and store
+      const { client: openai, model: embedModel } = await getEmbeddingClient()
+
       for (let i = 0; i < chunks.length; i++) {
         const content = chunks[i]
         const embeddingRes = await openai.embeddings.create({
-          model: 'text-embedding-3-small',
+          model: embedModel,
           input: content
         })
         const embedding = embeddingRes.data[0].embedding
 
-        // Prisma 6 doesn't support vector types directly yet in all ways, 
-        // so we use raw SQL for the embedding column
         await prisma.$executeRaw`
           INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "embedding")
           VALUES (
-            gen_random_uuid()::text, 
-            ${documentId}, 
-            ${content}, 
-            ${i}, 
+            gen_random_uuid()::text,
+            ${documentId},
+            ${content},
+            ${i},
             ${embedding}::vector
           )
         `
       }
 
-      // 4. Update document status
       await prisma.document.update({
         where: { id: documentId },
         data: { processingStatus: 'ready' }

@@ -31,7 +31,7 @@ export default function DocumentDetailPage() {
     if (!session?.user || !id) return
 
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/${id}`, { headers })
@@ -50,7 +50,7 @@ export default function DocumentDetailPage() {
     if (!session?.user || summarizing || !!doc?.summaryCache) return
     setSummarizing(true)
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     try {
@@ -95,7 +95,7 @@ export default function DocumentDetailPage() {
         {/* Document Viewer */}
         <div className="lg:col-span-2 aspect-[3/4] bg-white dark:bg-zinc-900 rounded-3xl border-4 border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden relative">
           <iframe 
-            src={`${process.env.NEXT_PUBLIC_API_URL}/documents/${id}/file?token=${(session?.user as any).accessToken}`}
+            src={`${process.env.NEXT_PUBLIC_API_URL}/documents/${id}/file?token=${session?.user?.accessToken}`}
             className="w-full h-full border-none"
             title={doc.title}
           />

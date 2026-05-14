@@ -16,20 +16,14 @@ const examRoutes: FastifyPluginAsync = async (fastify) => {
 
     const context = doc.chunks.map((c: any) => c.content).join('\n\n')
 
-    const response = await fastify.openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: `Extract 5 multiple-choice questions from this academic text. 
-          Return JSON format: { "questions": [ { "question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": "...", "explanation": "..." } ] }`
-        },
-        { role: 'user', content: context }
-      ],
-      response_format: { type: 'json_object' }
-    })
+    const response = await fastify.ai.chat(
+      `Extract 5 multiple-choice questions from this academic text. 
+      Return JSON format: { "questions": [ { "question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": "...", "explanation": "..." } ] }`,
+      [{ role: 'user', content: context }],
+      'json_object'
+    )
 
-    const { questions } = JSON.parse(response.choices[0].message.content || '{"questions":[]}')
+    const { questions } = JSON.parse(response || '{"questions":[]}')
 
     for (const q of questions) {
       await fastify.prisma.extractedQuestion.create({

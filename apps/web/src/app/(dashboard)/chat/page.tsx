@@ -49,7 +49,7 @@ export default function ChatPage() {
     if (!session?.user) return
 
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     // Fetch courses
@@ -70,7 +70,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (activeSession && session?.user) {
       const headers = {
-        'Authorization': `Bearer ${(session.user as any).accessToken}`
+        'Authorization': `Bearer ${session.user.accessToken}`
       }
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/sessions/${activeSession.id}/messages`, { headers })
         .then(res => res.json())
@@ -91,7 +91,7 @@ export default function ChatPage() {
 
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     const course = courses.find(c => c.id === selectedCourse)
@@ -128,7 +128,7 @@ export default function ChatPage() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(session?.user as any).accessToken}`
+          'Authorization': `Bearer ${session?.user?.accessToken}`
         },
         body: JSON.stringify({ content: input })
       })

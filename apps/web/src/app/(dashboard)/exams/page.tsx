@@ -32,7 +32,7 @@ export default function ExamsLobbyPage() {
     if (!session?.user) return
 
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     Promise.all([
@@ -55,7 +55,7 @@ export default function ExamsLobbyPage() {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${(session.user as any).accessToken}`
+        'Authorization': `Bearer ${session.user.accessToken}`
       },
       body: JSON.stringify({ courseId })
     })

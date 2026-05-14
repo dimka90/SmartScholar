@@ -32,7 +32,7 @@ export default function DashboardPage() {
     if (!session?.user) return
 
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     // Fetch stats and recent activity

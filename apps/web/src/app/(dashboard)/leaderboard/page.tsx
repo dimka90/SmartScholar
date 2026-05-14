@@ -29,7 +29,7 @@ export default function LeaderboardPage() {
     if (!session?.user) return
 
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     Promise.all([

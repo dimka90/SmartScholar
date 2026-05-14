@@ -33,6 +33,14 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     })
 
     const token = await reply.jwtSign({ id: user.id, role: user.role })
+
+    reply.setCookie('token', token, {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 // 7 days
+    })
+
     return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role } }
   })
 
@@ -53,14 +61,20 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     const token = await reply.jwtSign({ id: user.id, role: user.role })
+
+    reply.setCookie('token', token, {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 // 7 days
+    })
+
     return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role } }
   })
 
   // Logout
   fastify.post('/logout', async (request, reply) => {
-    // In JWT setup without refresh tokens in DB, we just respond success.
-    // The requirement mentioned Redis for refresh token invalidation.
-    // I'll implement basic logout for now.
+    reply.clearCookie('token', { path: '/' })
     return { message: 'Logged out successfully' }
   })
 }

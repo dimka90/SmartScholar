@@ -48,7 +48,7 @@ export default function GroupChatPage() {
     if (!session?.user || !id) return
 
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     // Fetch group details and messages
@@ -78,7 +78,7 @@ export default function GroupChatPage() {
     setSubmitting(true)
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     try {

@@ -45,7 +45,7 @@ export default function DocumentsPage() {
   const fetchDocuments = async () => {
     if (!session?.user) return
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents`, { headers })
@@ -62,7 +62,7 @@ export default function DocumentsPage() {
     if (!session?.user) return
 
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     fetchDocuments()
@@ -91,7 +91,7 @@ export default function DocumentsPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/upload`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${(session?.user as any).accessToken}`
+          'Authorization': `Bearer ${session?.user?.accessToken}`
         },
         body: formData
       })

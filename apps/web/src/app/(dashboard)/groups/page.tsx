@@ -27,7 +27,7 @@ export default function GroupsLobbyPage() {
   const fetchGroups = async () => {
     if (!session?.user) return
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups`, { headers })
@@ -44,7 +44,7 @@ export default function GroupsLobbyPage() {
     if (!session?.user) return
 
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     fetchGroups()
@@ -65,7 +65,7 @@ export default function GroupsLobbyPage() {
     setIsCreating(true)
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${(session?.user as any).accessToken}`
+      'Authorization': `Bearer ${session?.user?.accessToken}`
     }
 
     try {

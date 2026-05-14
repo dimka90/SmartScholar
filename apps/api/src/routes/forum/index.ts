@@ -18,10 +18,9 @@ const forumRoutes: FastifyPluginAsync = async (fastify) => {
     // AI Moderation
     let isFlagged = false
     try {
-      const moderation = await fastify.openai.moderations.create({ input: `${title}\n${content}` })
-      isFlagged = moderation.results[0].flagged
-    } catch (err) {
-      fastify.log.error('OpenAI moderation failed', err)
+      isFlagged = await fastify.ai.moderate(`${title}\n${content}`)
+    } catch (err: any) {
+      fastify.log.error('OpenAI moderation failed: %s', err?.message || err)
       // Default to unflagged if moderation API fails
     }
 

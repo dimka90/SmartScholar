@@ -24,7 +24,7 @@ export default function NewForumPostPage() {
     if (!session?.user) return
 
     const headers = {
-      'Authorization': `Bearer ${(session.user as any).accessToken}`
+      'Authorization': `Bearer ${session.user.accessToken}`
     }
 
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`, { headers })
@@ -51,7 +51,7 @@ export default function NewForumPostPage() {
     const tags = tagsInput.split(',').map(t => t.trim()).filter(Boolean)
 
     const headers = {
-      'Authorization': `Bearer ${(session?.user as any).accessToken}`,
+      'Authorization': `Bearer ${session?.user?.accessToken}`,
       'Content-Type': 'application/json'
     }
 

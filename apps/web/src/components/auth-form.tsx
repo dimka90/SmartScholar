@@ -120,13 +120,7 @@ export function AuthForm({ type }: AuthFormProps) {
         {type === 'register' && (
           <div className="space-y-1">
             <label className="text-sm font-medium">Role</label>
-            <select
-              {...register('role')}
-              className="w-full px-4 py-2 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700"
-            >
-              <option value="STUDENT">Student</option>
-              <option value="LECTURER">Lecturer</option>
-            </select>
+            <input type="hidden" {...register('role')} value="STUDENT" />
           </div>
         )}
 
