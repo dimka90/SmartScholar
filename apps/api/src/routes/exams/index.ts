@@ -17,8 +17,8 @@ const examRoutes: FastifyPluginAsync = async (fastify) => {
     const context = doc.chunks.map((c: any) => c.content).join('\n\n')
 
     const response = await fastify.ai.chat(
-      `Extract 5 multiple-choice questions from this academic text. 
-      Return JSON format: { "questions": [ { "question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": "...", "explanation": "..." } ] }`,
+      `Extract 5 multiple-choice questions from this academic text. Each question must have 4 options with full text. The correctAnswer should be the letter (A, B, C, or D) of the correct option.
+      Return JSON format: { "questions": [ { "question": "...", "options": ["full option text A", "full option text B", "full option text C", "full option text D"], "correctAnswer": "A", "explanation": "..." } ] }`,
       [{ role: 'user', content: context }],
       'json_object'
     )
@@ -45,9 +45,23 @@ const examRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/sessions', async (request) => {
     return fastify.prisma.examSession.findMany({
       where: { userId: request.user.id },
+      include: { course: { select: { code: true, name: true } } },
       orderBy: { createdAt: 'desc' },
       take: 20
     })
+  })
+
+  // Get a single exam session
+  fastify.get('/sessions/:id', async (request, reply) => {
+    const { id } = request.params as { id: string }
+    const session = await fastify.prisma.examSession.findUnique({
+      where: { id },
+      include: { course: { select: { code: true, name: true } } }
+    })
+    if (!session || session.userId !== request.user.id) {
+      return reply.status(404).send({ message: 'Session not found' })
+    }
+    return session
   })
 
   // Start exam session

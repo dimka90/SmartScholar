@@ -111,14 +111,14 @@ export default function DocumentDetailPage() {
                   AI Summary
                 </h3>
                 <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                  {doc.summaryCache.overview}
+                  {doc.summaryCache.overview || 'No overview available.'}
                 </p>
               </div>
 
               <div className="space-y-4">
                 <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500">Key Concepts</h3>
                 <ul className="space-y-3">
-                  {doc.summaryCache.keyConcepts.map((concept, i) => (
+                  {(doc.summaryCache.keyConcepts || []).map((concept, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm">
                       <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
                       {concept}
@@ -130,7 +130,7 @@ export default function DocumentDetailPage() {
               <div className="space-y-4">
                 <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500">Likely Exam Topics</h3>
                 <ul className="space-y-3">
-                  {doc.summaryCache.examTopics.map((topic, i) => (
+                  {(doc.summaryCache.examTopics || []).map((topic, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm">
                       <AlertCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
                       {topic}

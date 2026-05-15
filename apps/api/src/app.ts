@@ -17,6 +17,9 @@ const app: FastifyPluginAsync<AppOptions> = async (
     options: opts
   })
 
+  // Health check (no auth)
+  fastify.get('/health', async () => ({ status: 'ok', service: 'smartscholar-api', message: 'You probably shouldn\'t be here...', timestamp: new Date().toISOString() }))
+
   // Public routes (no auth) — must be registered BEFORE the autoload routes
   // so they are outside the authenticated route scopes
   fastify.register(documentFileRoute, { prefix: '/api/documents' })

@@ -134,6 +134,72 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
     return { message: 'Post deleted' }
   })
 
+  // ── Forum Management (All Posts) ──
+
+  fastify.get('/forum', async (request) => {
+    const { page = '1', limit = '50', courseId, status, search } = request.query as any
+    const skip = (parseInt(page) - 1) * parseInt(limit)
+    const take = parseInt(limit)
+
+    const where: any = {}
+    if (courseId) where.courseId = courseId
+    if (status === 'flagged') where.isFlagged = true
+    else if (status === 'approved') where.isApproved = true
+    else if (status === 'pending') { where.isApproved = false; where.isFlagged = true }
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { content: { contains: search, mode: 'insensitive' } }
+      ]
+    }
+
+    const [posts, total] = await Promise.all([
+      fastify.prisma.forumPost.findMany({
+        skip, take, where,
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+          course: { select: { id: true, code: true, name: true } },
+          _count: { select: { replies: true } }
+        },
+        orderBy: { createdAt: 'desc' }
+      }),
+      fastify.prisma.forumPost.count({ where })
+    ])
+
+    return { posts, total, page: parseInt(page), totalPages: Math.ceil(total / take) }
+  })
+
+  fastify.put('/forum/posts/:id', async (request) => {
+    const { id } = request.params as { id: string }
+    const schema = z.object({
+      title: z.string().optional(),
+      content: z.string().optional(),
+      tags: z.array(z.string()).optional()
+    })
+    const data = schema.parse(request.body)
+    const post = await fastify.prisma.forumPost.update({ where: { id }, data })
+    await log(request.user.id, 'UPDATE_FORUM_POST', { postId: id })
+    return post
+  })
+
+  fastify.get('/forum/posts/:id/replies', async (request) => {
+    const { id: postId } = request.params as { id: string }
+    return fastify.prisma.forumReply.findMany({
+      where: { postId },
+      include: { user: { select: { id: true, name: true, email: true } } },
+      orderBy: { createdAt: 'asc' }
+    })
+  })
+
+  fastify.delete('/forum/posts/:id/replies/:replyId', async (request, reply) => {
+    const { id: postId, replyId } = request.params as { id: string; replyId: string }
+    const dbReply = await fastify.prisma.forumReply.findUnique({ where: { id: replyId } })
+    if (!dbReply || dbReply.postId !== postId) return reply.status(404).send({ message: 'Reply not found' })
+    await fastify.prisma.forumReply.delete({ where: { id: replyId } })
+    await log(request.user.id, 'DELETE_FORUM_REPLY', { postId, replyId })
+    return { message: 'Reply deleted' }
+  })
+
   // ── Notification Broadcast ──
 
   fastify.post('/notifications/broadcast', async (request) => {

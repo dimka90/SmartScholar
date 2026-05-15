@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { Clock, ChevronLeft, ChevronRight, Send, AlertCircle, Loader2 } from 'lucide-react'
 
 type Question = {
@@ -21,6 +22,7 @@ type Session = {
 export default function ExamSessionPage() {
   const { id } = useParams()
   const router = useRouter()
+  const { data: sessionAuth } = useSession()
   const [session, setSession] = useState<Session | null>(null)
   const [currentIdx, setCurrentIdx] = useState(0)
   const [answers, setAnswers] = useState<Record<number, string>>({})
@@ -29,14 +31,17 @@ export default function ExamSessionPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/sessions/${id}`)
+    if (!sessionAuth?.user?.accessToken) return
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/sessions/${id}`, {
+      headers: { 'Authorization': `Bearer ${sessionAuth.user.accessToken}` }
+    })
       .then(res => res.json())
       .then(data => {
         setSession(data)
-        setTimeLeft(data.totalQuestions * 60) // 1 minute per question
+        setTimeLeft(data.totalQuestions * 60)
         setLoading(false)
       })
-  }, [id])
+  }, [id, sessionAuth])
 
   useEffect(() => {
     if (timeLeft > 0 && !submitting) {
@@ -51,7 +56,7 @@ export default function ExamSessionPage() {
     setSubmitting(true)
     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/sessions/${id}/submit`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionAuth?.user?.accessToken}` },
       body: JSON.stringify({ answers })
     })
     router.push(`/exams/${id}/results`)

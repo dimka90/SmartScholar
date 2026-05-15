@@ -78,9 +78,15 @@ const forumRoutes: FastifyPluginAsync = async (fastify) => {
   })
 
   // Reply to post
-  fastify.post('/posts/:id/replies', async (request) => {
+  fastify.post('/posts/:id/replies', async (request, reply) => {
     const { id: postId } = request.params as { id: string }
     const { content } = request.body as { content: string }
+
+    // Moderate reply content
+    const isFlagged = await fastify.ai.moderate(content)
+    if (isFlagged) {
+      return reply.status(400).send({ message: 'Your reply was flagged as inappropriate and cannot be posted.' })
+    }
 
     return fastify.prisma.$transaction(async (tx) => {
       const reply = await tx.forumReply.create({

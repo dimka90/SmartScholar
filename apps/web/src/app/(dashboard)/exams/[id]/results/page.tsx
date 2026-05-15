@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { Trophy, CheckCircle2, XCircle, AlertCircle, ArrowLeft, RefreshCw, MessageSquare } from 'lucide-react'
 
@@ -23,17 +24,21 @@ type Session = {
 
 export default function ExamResultsPage() {
   const { id } = useParams()
+  const { data: sessionAuth } = useSession()
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/sessions/${id}`)
+    if (!sessionAuth?.user?.accessToken) return
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/sessions/${id}`, {
+      headers: { 'Authorization': `Bearer ${sessionAuth.user.accessToken}` }
+    })
       .then(res => res.json())
       .then(data => {
         setSession(data)
         setLoading(false)
       })
-  }, [id])
+  }, [id, sessionAuth])
 
   if (loading) return <div className="p-8">Loading...</div>
   if (!session) return <div className="p-8">Results not found</div>
