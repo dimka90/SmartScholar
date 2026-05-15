@@ -3,21 +3,32 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { PDFParse } from 'pdf-parse'
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
-import OpenAI from 'openai'
 import { PrismaClient } from '@smartscholar/db'
+import { createProviderInstance, AiProviderConfig } from './ai'
 
 const prisma = new PrismaClient()
 
 async function getEmbeddingClient() {
-  // 1. Try dedicated embedding provider (isEmbedProvider = true)
+  // 1. Try dedicated embedding provider
   const embedProv = await prisma.aiProvider.findFirst({ where: { isEmbedProvider: true } })
-  if (embedProv?.embedModel) {
-    return { client: new OpenAI({ apiKey: embedProv.apiKey, baseURL: embedProv.baseUrl || undefined }), model: embedProv.embedModel }
+  if (embedProv) {
+    const config: AiProviderConfig = {
+      id: embedProv.id, name: embedProv.name, provider: embedProv.provider as any,
+      apiKey: embedProv.apiKey, baseUrl: embedProv.baseUrl,
+      chatModel: embedProv.chatModel, embedModel: embedProv.embedModel
+    }
+    const instance = createProviderInstance(config)
+    return instance
   }
 
-  // 2. Fall back to env var
+  // 2. Fall back to env var with OpenAI
   if (process.env.OPENAI_API_KEY) {
-    return { client: new OpenAI({ apiKey: process.env.OPENAI_API_KEY }), model: 'text-embedding-3-small' }
+    const config: AiProviderConfig = {
+      id: 'env', name: 'Env Embed', provider: 'openai',
+      apiKey: process.env.OPENAI_API_KEY, baseUrl: null,
+      chatModel: 'gpt-4o', embedModel: 'text-embedding-3-small'
+    }
+    return createProviderInstance(config)
   }
 
   throw new Error('No embedding provider configured. Set an AI provider with isEmbedProvider=true and an embedModel.')
@@ -46,15 +57,11 @@ export const ragWorker = new Worker(
       })
       const chunks = await splitter.splitText(text)
 
-      const { client: openai, model: embedModel } = await getEmbeddingClient()
+      const embedder = await getEmbeddingClient()
 
       for (let i = 0; i < chunks.length; i++) {
         const content = chunks[i]
-        const embeddingRes = await openai.embeddings.create({
-          model: embedModel,
-          input: content
-        })
-        const embedding = embeddingRes.data[0].embedding
+        const embedding = await embedder.embed(content)
 
         await prisma.$executeRaw`
           INSERT INTO "DocumentChunk" ("id", "documentId", "content", "chunkIndex", "embedding")

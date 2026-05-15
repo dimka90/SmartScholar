@@ -1,5 +1,6 @@
 import { createOpenAIProvider } from './providers/openai'
 import { createAnthropicProvider } from './providers/anthropic'
+import { createGoogleProvider } from './providers/google'
 
 export type ProviderType = 'openai' | 'anthropic' | 'google' | 'groq' | 'togetherai'
 
@@ -36,6 +37,12 @@ export function createProviderInstance(config: AiProviderConfig): AiProviderInst
         chatModel: config.chatModel
       })
     case 'google':
+      return createGoogleProvider({
+        apiKey: config.apiKey,
+        baseUrl: config.baseUrl || undefined,
+        chatModel: config.chatModel,
+        embedModel: config.embedModel || undefined
+      })
     case 'groq':
     case 'togetherai':
       return createOpenAIProvider({

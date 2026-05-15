@@ -1,6 +1,7 @@
 import fp from 'fastify-plugin'
 import { PrismaClient } from '@smartscholar/db'
 import { createProviderInstance, AiProviderConfig, AiProviderInstance } from '../lib/ai'
+import OpenAI from 'openai'
 
 let cachedProvider: { config: AiProviderConfig; instance: AiProviderInstance } | null = null
 let cachedEmbedProvider: { config: AiProviderConfig; instance: AiProviderInstance } | null = null
@@ -75,9 +76,27 @@ export default fp(async (fastify) => {
     },
 
     async moderate(text: string) {
-      const active = await getActiveProvider(fastify.prisma)
-      if (!active) throw new Error('No active AI provider configured')
-      return active.instance.moderate(text)
+      // 1. Keyword-based pre-filter (fast, no API call)
+      const keywords = ['kill', 'harm', 'attack', 'bomb', 'terrorist', 'suicide', 'abuse', 'hate', 'racist', 'slur']
+      const lower = text.toLowerCase()
+      const hasFlaggedKeyword = keywords.some(k => lower.includes(k))
+      if (hasFlaggedKeyword) return true
+
+      // 2. Try OpenAI moderation via env var
+      if (process.env.OPENAI_API_KEY) {
+        try {
+          const controller = new AbortController()
+          const timeout = setTimeout(() => controller.abort(), 5000)
+          const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 5000 })
+          const response = await openai.moderations.create({ input: text })
+          clearTimeout(timeout)
+          return response.results[0].flagged
+        } catch {
+          // API key may be rate-limited; fall through
+        }
+      }
+
+      return false
     }
   }
 
