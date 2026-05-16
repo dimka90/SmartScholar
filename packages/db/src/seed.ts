@@ -123,37 +123,33 @@ async function main() {
   }
 
   // ──────────────────────────────────────────────
-  // 5. AI Providers
+  // 5. AI Providers — keys configured via admin UI
   // ──────────────────────────────────────────────
-  const groqKey = process.env.GROQ_API_KEY || ''
-  const geminiKey = process.env.GEMINI_API_KEY || ''
-  const openaiKey = process.env.OPENAI_API_KEY || ''
-
   const aiProviderData = [
     {
       name: 'Groq',
       provider: 'groq',
-      apiKey: groqKey,
+      apiKey: '',
       baseUrl: 'https://api.groq.com/openai/v1',
       chatModel: 'llama-3.1-8b-instant',
       embedModel: null,
-      isActive: !!groqKey,
+      isActive: false,
       isEmbedProvider: false,
     },
     {
       name: 'Gemini',
       provider: 'google',
-      apiKey: geminiKey,
+      apiKey: '',
       baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
       chatModel: 'gemini-2.0-flash',
       embedModel: 'gemini-embedding-2',
       isActive: false,
-      isEmbedProvider: !!geminiKey,
+      isEmbedProvider: false,
     },
     {
       name: 'OpenAI',
       provider: 'openai',
-      apiKey: openaiKey,
+      apiKey: '',
       baseUrl: 'https://api.openai.com/v1',
       chatModel: 'gpt-4o-mini',
       embedModel: 'text-embedding-3-small',
@@ -165,14 +161,7 @@ async function main() {
   for (const p of aiProviderData) {
     await prisma.aiProvider.upsert({
       where: { name: p.name },
-      update: {
-        apiKey: p.apiKey,
-        baseUrl: p.baseUrl,
-        chatModel: p.chatModel,
-        embedModel: p.embedModel,
-        isActive: p.isActive,
-        isEmbedProvider: p.isEmbedProvider,
-      },
+      update: {},
       create: p,
     })
   }
